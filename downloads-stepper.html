@@ -1,0 +1,331 @@
+<title>Song Downloads Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a projector stepper. Task strip on top, pseudocode and Java side by side, one caption bar below. */
+:root {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --ink: #1b2232;
+  --muted: #5a6478;
+  --rule: #d7dde8;
+  --accent: #2c56c9;
+  --hl: #ffe27a;
+  --hl-ink: #1b2232;
+  --link: #dbe6ff;
+  --kw: #2c56c9;
+  --str: #1d7a52;
+  --num: #a24a12;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+    --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+    --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+  --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+  --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-text);
+  font-size: clamp(15px, 1.25vw, 19px); line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  box-sizing: border-box;
+}
+.app { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+.spacer { flex: 1; }
+.counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.task {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline;
+}
+.task code { font-family: var(--font-code); font-size: 0.95em; }
+.sig { font-family: var(--font-code); font-weight: 600; }
+.task .ex { color: var(--muted); }
+
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 14px; flex: 1; }
+@media (max-width: 880px) { .panes { grid-template-columns: minmax(0, 1fr); } }
+.pane { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 0; min-width: 0; display: flex; flex-direction: column; }
+.pane h2 {
+  margin: 0 18px 10px; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.lines { overflow-x: auto; }
+.ln {
+  display: grid; grid-template-columns: 2.6em minmax(0, 1fr); align-items: start;
+  padding: 3px 18px 3px 0; border-left: 5px solid transparent;
+  transition: background-color 0.25s, opacity 0.25s;
+}
+.ln .no { color: var(--muted); text-align: right; padding-right: 0.9em; font-family: var(--font-code); font-size: 0.8em; padding-top: 0.25em; }
+.ln .tx { white-space: pre-wrap; }
+.pseudo .ln { font-size: 1.12em; }
+.java .ln .tx { font-family: var(--font-code); white-space: pre; font-size: 1.02em; }
+.ln.pending { visibility: hidden; }
+.ln.now { background: var(--hl); color: var(--hl-ink); border-left-color: var(--accent); }
+.ln.now .no { color: var(--hl-ink); }
+.ln.linked { background: var(--link); border-left-color: var(--accent); }
+.kw { color: var(--kw); font-weight: 600; }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.ln.now .kw, .ln.now .str, .ln.now .num { color: inherit; }
+
+.caption {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+}
+.caption .where { font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.caption .say { flex: 1 1 320px; font-size: 1.1em; min-width: 0; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-weight: 700; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:focus-visible, .tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hint { color: var(--muted); font-size: 0.85em; }
+@media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
+</style>
+
+<div class="app">
+  <header>
+    <h1>Song Downloads</h1>
+    <div class="tabs" role="tablist" aria-label="Question part">
+      <button class="tab" role="tab" id="tab-a" data-part="a" aria-selected="true">2a Ones digit</button>
+      <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">2b Title by artist</button>
+    </div>
+
+    <div class="spacer"></div>
+    <span class="counter" id="counter" aria-live="polite"></span>
+  </header>
+
+  <section class="task" id="task" aria-label="The task"></section>
+
+  <main class="panes">
+    <section class="pane pseudo" aria-label="Pseudocode">
+      <h2><span>Pseudocode</span><span id="pseudo-count"></span></h2>
+      <div class="lines" id="pseudo"></div>
+    </section>
+    <section class="pane java" aria-label="Java solution">
+      <h2><span>Java solution</span><span id="code-count"></span></h2>
+      <div class="lines" id="code"></div>
+    </section>
+  </main>
+
+  <section class="caption" aria-live="polite">
+    <span class="where" id="where"></span>
+    <span class="say" id="say"></span>
+    <div class="controls">
+      <button class="btn" id="back">← Back</button>
+      <button class="btn primary" id="next">Next →</button>
+      <button class="btn" id="all">Show all</button>
+      <button class="btn" id="restart">Restart</button>
+      <button class="btn" id="full">Full screen</button>
+    </div>
+  </section>
+  <p class="hint">Next: → , Space or Page Down (presentation clickers work). Back: ← or Page Up. Restart: Home.</p>
+</div>
+
+<script>
+const PARTS = {
+  a: {
+    sig: "Code segment (no method header)",
+    task: "<code>downloads</code> is a positive int. Print <code>\"exactly once\"</code> if the ones digit appears exactly one other time in the number. Otherwise print <code>\"not exactly once\"</code>.",
+    ex: "1734567 → exactly once · 325322 → not exactly once",
+    start: "Read the rules and the examples together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "ones = the last digit of downloads", say: "The digit we are looking for. For 1734567 it is 7." },
+      { t: "rest = downloads without its last digit", say: "The ones digit itself must not count, so search only the other digits: 173456." },
+      { t: "Set count to 0.", say: "Count how many times the ones digit shows up in the rest." },
+      { t: "While rest still has digits:", say: "We do not know how many digits there are, so keep going until none are left." },
+      { t: "    If the last digit of rest equals ones, add 1 to count.", say: "Look at one digit at a time, from the right." },
+      { t: "    Remove the last digit of rest.", say: "This moves on to the next digit. Without it the loop never ends." },
+      { t: "If count is exactly 1, print \"exactly once\".", say: "Exactly one other time: not 0, not 2 or more." },
+      { t: "Otherwise, print \"not exactly once\".", say: "Every other count lands here." }
+    ],
+    code: [
+      { t: "int ones = downloads % 10;", s: 1 },
+      { t: "int rest = downloads / 10;", s: 2 },
+      { t: "int count = 0;", s: 3 },
+      { t: "while (rest > 0)", s: 4 },
+      { t: "{", s: 4 },
+      { t: "    if (rest % 10 == ones)", s: 5 },
+      { t: "    {", s: 5 },
+      { t: "        count++;", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    rest = rest / 10;", s: 6 },
+      { t: "}", s: 6 },
+      { t: "if (count == 1)", s: 7 },
+      { t: "{", s: 7 },
+      { t: "    System.out.println(\"exactly once\");", s: 7 },
+      { t: "}", s: 7 },
+      { t: "else", s: 8 },
+      { t: "{", s: 8 },
+      { t: "    System.out.println(\"not exactly once\");", s: 8 },
+      { t: "}", s: 8 }
+    ],
+    steps: [
+      { maps: [0], say: "% 10 gives the remainder after dividing by 10: the last digit. 1734567 % 10 is 7." },
+      { maps: [1], say: "Integer division by 10 drops the last digit. 1734567 / 10 is 173456." },
+      { maps: [2], say: "No matches yet." },
+      { maps: [3], say: "When rest reaches 0, every digit has been checked." },
+      { maps: [4], say: "rest % 10 is the digit on the right of rest. For 173456 that is 6, not 7." },
+      { maps: [5], say: "173456 becomes 17345, then 1734, 173, 17, 1, 0. The 7 in 17 is counted once." },
+      { maps: [6], say: "count == 1, so 1734567 prints \"exactly once\"." },
+      { maps: [7], say: "For 325322 the 2 shows up twice in 32532, so count is 2: \"not exactly once\"." }
+    ]
+  },
+  b: {
+    sig: "Code segment (no method header)",
+    task: "<code>songInfo</code> holds artist-album-title, separated by two hyphens. Print the song title, then <code>\" by \"</code>, then the artist name.",
+    ex: "\"Carrie Ferriero-Greatest Hits-Tell Me Why\" → Tell Me Why by Carrie Ferriero",
+    start: "Read the rules and the examples together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Find the first hyphen.", say: "The first hyphen ends the artist name." },
+      { t: "artist = everything before the first hyphen", say: "\"Carrie Ferriero\"" },
+      { t: "rest = everything after the first hyphen", say: "Cut off the artist: \"Greatest Hits-Tell Me Why\"." },
+      { t: "Find the hyphen in rest.", say: "rest has only one hyphen left: the one before the title." },
+      { t: "title = everything in rest after that hyphen", say: "\"Tell Me Why\"" },
+      { t: "Print title + \" by \" + artist.", say: "Title first, then the artist. Note the spaces inside \" by \"." }
+    ],
+    code: [
+      { t: "int first = songInfo.indexOf(\"-\");", s: 1 },
+      { t: "String artist = songInfo.substring(0, first);", s: 2 },
+      { t: "String rest = songInfo.substring(first + 1);", s: 3 },
+      { t: "int second = rest.indexOf(\"-\");", s: 4 },
+      { t: "String title = rest.substring(second + 1);", s: 5 },
+      { t: "System.out.println(title + \" by \" + artist);", s: 6 }
+    ],
+    steps: [
+      { maps: [0], say: "indexOf gives the position of the first \"-\". In the Carrie example it is 15." },
+      { maps: [1], say: "substring(0, 15) stops just before the hyphen: \"Carrie Ferriero\"." },
+      { maps: [2], say: "first + 1 skips the hyphen itself. One argument means \"to the end\"." },
+      { maps: [3], say: "indexOf always finds the FIRST hyphen, so search rest, not songInfo. Here it is 13." },
+      { maps: [4], say: "Everything after that hyphen: \"Tell Me Why\"." },
+      { maps: [5], say: "Prints: Tell Me Why by Carrie Ferriero" }
+    ]
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+let part = "a";
+let step = 0;
+let showAll = false;
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function highlight(src) {
+  return esc(src).replace(/("[^"]*")|\b(public|int|for|while|if|else|return|String)\b|\b(\d+)\b/g, (m, str, kw, num) => {
+    if (str) return '<span class="str">' + str + "</span>";
+    if (kw) return '<span class="kw">' + kw + "</span>";
+    return '<span class="num">' + num + "</span>";
+  });
+}
+function total(p) { return 1 + p.pseudo.length + p.steps.length; }
+
+function renderStatic() {
+  const p = PARTS[part];
+  $("task").innerHTML = '<span class="sig">' + esc(p.sig) + '</span><span>' + p.task + '</span><span class="ex">' + esc(p.ex) + "</span>";
+  $("pseudo").innerHTML = p.pseudo.map((l, i) =>
+    '<div class="ln" data-i="' + i + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + esc(l.t) + "</span></div>").join("");
+  $("code").innerHTML = p.code.map((l, i) =>
+    '<div class="ln" data-s="' + l.s + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + highlight(l.t) + "</span></div>").join("");
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.part === part)));
+}
+
+function render() {
+  const p = PARTS[part];
+  const nP = p.pseudo.length, nC = p.steps.length, last = total(p) - 1;
+  if (showAll) step = last;
+  const pseudoShown = Math.min(step, nP);
+  const codeStep = Math.max(0, step - nP);
+
+  document.querySelectorAll("#pseudo .ln").forEach((el) => {
+    const i = Number(el.dataset.i);
+    el.classList.toggle("pending", i >= pseudoShown);
+    el.classList.toggle("now", !showAll && codeStep === 0 && i === pseudoShown - 1);
+    const linked = !showAll && codeStep > 0 && p.steps[codeStep - 1].maps.includes(i);
+    el.classList.toggle("linked", linked);
+  });
+  document.querySelectorAll("#code .ln").forEach((el) => {
+    const s = Number(el.dataset.s);
+    el.classList.toggle("pending", s > codeStep);
+    el.classList.toggle("now", !showAll && s === codeStep);
+    el.classList.remove("linked");
+  });
+
+  let where, say;
+  if (showAll) { where = "Full solution"; say = "Everything is showing. Press Restart to step through again."; }
+  else if (step === 0) { where = "The task"; say = p.start; }
+  else if (codeStep === 0) { where = "Pseudocode · line " + step + " of " + nP; say = p.pseudo[step - 1].say; }
+  else { where = "Java · step " + codeStep + " of " + nC; say = p.steps[codeStep - 1].say; }
+  $("where").textContent = where;
+  $("say").textContent = say;
+  $("pseudo-count").textContent = pseudoShown + " / " + nP;
+  $("code-count").textContent = codeStep + " / " + nC;
+  $("counter").textContent = "Step " + step + " of " + last;
+  $("back").disabled = step === 0;
+  $("next").disabled = step === last;
+  $("all").textContent = showAll ? "Step mode" : "Show all";
+
+  const now = document.querySelector(".ln.now");
+  if (now && now.scrollIntoView) now.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function go(d) {
+  const last = total(PARTS[part]) - 1;
+  showAll = false;
+  step = Math.max(0, Math.min(last, step + d));
+  render();
+}
+function setPart(p, fromHash) {
+  if (!PARTS[p]) p = "a";
+  part = p; step = 0; showAll = false;
+  if (!fromHash) { try { history.replaceState(null, "", "#part-" + p); } catch (e) { location.hash = "part-" + p; } }
+  renderStatic(); render();
+}
+
+$("next").addEventListener("click", () => go(1));
+$("back").addEventListener("click", () => go(-1));
+$("restart").addEventListener("click", () => { showAll = false; step = 0; render(); });
+$("all").addEventListener("click", () => { if (showAll) { showAll = false; step = 0; } else { showAll = true; } render(); });
+$("full").addEventListener("click", () => {
+  const el = document.documentElement;
+  try {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  } catch (e) {}
+});
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setPart(t.dataset.part)));
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) {
+    if (e.key === "Enter" && e.target.tagName === "BUTTON") return;
+    e.preventDefault(); go(1);
+  } else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(-1); }
+  else if (e.key === "Home") { e.preventDefault(); showAll = false; step = 0; render(); }
+});
+function fromHash() { const m = location.hash.match(/^#part-(a|b)$/); setPart(m ? m[1] : "a", true); }
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
