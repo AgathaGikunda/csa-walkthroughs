@@ -110,7 +110,11 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
 
 <div class="app">
   <header>
-    <h1>Text Column: Question 1a</h1>
+    <h1>Text Processing</h1>
+    <div class="tabs" role="tablist" aria-label="Question part">
+      <button class="tab" role="tab" id="tab-a" data-part="a" aria-selected="true">1a Text column</button>
+      <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">1b Longest prefix</button>
+    </div>
 
     <div class="spacer"></div>
     <span class="counter" id="counter" aria-live="polite"></span>
@@ -197,6 +201,40 @@ const PARTS = {
       { maps: [6], say: "Same loop, right times: 4 times for \"abc\"." },
       { maps: [7], say: "Close the box with the right bar." },
       { maps: [7], say: "Print the finished line: |...abc....|" }
+    ]
+  },
+  b: {
+    sig: "Code segment (no method header)",
+    task: "Variables: <code>text</code> and <code>otherText</code> (Strings). Print the length of the longest prefix of <code>text</code> that is a substring of <code>otherText</code>. A prefix is a substring at the beginning of a string. If no prefix appears, print 0.",
+    ex: "\"apple\", \"happy\" → 3 · \"apple\", \"pineapple\" → 5 · \"apple\", \"leek\" → 0",
+    start: "Read the rules and the table together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Set longest to 0.", say: "If no prefix is found anywhere, the answer stays 0." },
+      { t: "For each length len from 1 to the length of text:", say: "Try every prefix: 1 letter, 2 letters, up to the whole word." },
+      { t: "    prefix = the first len letters of text", say: "For \"apple\": a, ap, app, appl, apple." },
+      { t: "    If prefix appears anywhere in otherText:", say: "A substring can be anywhere in otherText, not only at its start." },
+      { t: "        longest = len", say: "Each match is longer than the one before, so the latest match is the longest so far." },
+      { t: "After the loop, print longest.", say: "Print once, after every prefix has been tried." }
+    ],
+    code: [
+      { t: "int longest = 0;", s: 1 },
+      { t: "for (int len = 1; len <= text.length(); len++)", s: 2 },
+      { t: "{", s: 2 },
+      { t: "    String prefix = text.substring(0, len);", s: 3 },
+      { t: "    if (otherText.indexOf(prefix) >= 0)", s: 4 },
+      { t: "    {", s: 4 },
+      { t: "        longest = len;", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "}", s: 5 },
+      { t: "System.out.println(longest);", s: 6 }
+    ],
+    steps: [
+      { maps: [0], say: "Start at 0. For \"apple\" and \"leek\", nothing matches, so 0 is printed." },
+      { maps: [1], say: "len goes from 1 to text.length(). The <= includes the whole word: \"apple\" itself is a prefix." },
+      { maps: [2], say: "substring(0, len) is the first len letters. len 3 gives \"app\"." },
+      { maps: [3], say: "indexOf returns -1 when the prefix is not found, so >= 0 means it appears. \"app\" is in \"happy\" at index 1." },
+      { maps: [4], say: "Remember this length. For \"happy\": a, ap, app match, so longest ends at 3." },
+      { maps: [5], say: "Print after the loop. \"apple\" and \"pineapple\" print 5." }
     ]
   }
 };
