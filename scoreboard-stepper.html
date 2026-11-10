@@ -1,0 +1,331 @@
+<title>Scoreboard FRQ Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a projector stepper. Task strip on top, pseudocode and Java side by side, one caption bar below. */
+:root {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --ink: #1b2232;
+  --muted: #5a6478;
+  --rule: #d7dde8;
+  --accent: #2c56c9;
+  --hl: #ffe27a;
+  --hl-ink: #1b2232;
+  --link: #dbe6ff;
+  --kw: #2c56c9;
+  --str: #1d7a52;
+  --num: #a24a12;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+    --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+    --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+  --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+  --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-text);
+  font-size: clamp(15px, 1.25vw, 19px); line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  box-sizing: border-box;
+}
+.app { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
+.tabs { display: flex; gap: 6px; }
+.tab {
+  font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+.spacer { flex: 1; }
+.counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.task {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline;
+}
+.task code { font-family: var(--font-code); font-size: 0.95em; }
+.sig { font-family: var(--font-code); font-weight: 600; }
+.task .ex { color: var(--muted); }
+
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 14px; flex: 1; }
+@media (max-width: 880px) { .panes { grid-template-columns: minmax(0, 1fr); } }
+.pane { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 0; min-width: 0; display: flex; flex-direction: column; }
+.pane h2 {
+  margin: 0 18px 10px; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.lines { overflow-x: auto; }
+.ln {
+  display: grid; grid-template-columns: 2.6em minmax(0, 1fr); align-items: start;
+  padding: 3px 18px 3px 0; border-left: 5px solid transparent;
+  transition: background-color 0.25s, opacity 0.25s;
+}
+.ln .no { color: var(--muted); text-align: right; padding-right: 0.9em; font-family: var(--font-code); font-size: 0.8em; padding-top: 0.25em; }
+.ln .tx { white-space: pre-wrap; }
+.pseudo .ln { font-size: 1.12em; }
+.java .ln .tx { font-family: var(--font-code); white-space: pre; font-size: 1.02em; }
+.ln.pending { visibility: hidden; }
+.ln.now { background: var(--hl); color: var(--hl-ink); border-left-color: var(--accent); }
+.ln.now .no { color: var(--hl-ink); }
+.ln.linked { background: var(--link); border-left-color: var(--accent); }
+.kw { color: var(--kw); font-weight: 600; }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.ln.now .kw, .ln.now .str, .ln.now .num { color: inherit; }
+
+.caption {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+}
+.caption .where { font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.caption .say { flex: 1 1 320px; font-size: 1.1em; min-width: 0; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-weight: 700; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:focus-visible, .tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hint { color: var(--muted); font-size: 0.85em; }
+@media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
+</style>
+
+<div class="app">
+  <header>
+    <h1>Scoreboard FRQ</h1>
+    <div class="tabs" role="tablist" aria-label="FRQ part">
+      <button class="tab" role="tab" id="tab-a" data-part="a" aria-selected="true">Part (a) bestRound</button>
+      <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">Part (b) initials</button>
+    </div>
+    <div class="spacer"></div>
+    <span class="counter" id="counter" aria-live="polite"></span>
+  </header>
+
+  <section class="task" id="task" aria-label="The task"></section>
+
+  <main class="panes">
+    <section class="pane pseudo" aria-label="Pseudocode">
+      <h2><span>Pseudocode</span><span id="pseudo-count"></span></h2>
+      <div class="lines" id="pseudo"></div>
+    </section>
+    <section class="pane java" aria-label="Java solution">
+      <h2><span>Java solution</span><span id="code-count"></span></h2>
+      <div class="lines" id="code"></div>
+    </section>
+  </main>
+
+  <section class="caption" aria-live="polite">
+    <span class="where" id="where"></span>
+    <span class="say" id="say"></span>
+    <div class="controls">
+      <button class="btn" id="back">← Back</button>
+      <button class="btn primary" id="next">Next →</button>
+      <button class="btn" id="all">Show all</button>
+      <button class="btn" id="restart">Restart</button>
+      <button class="btn" id="full">Full screen</button>
+    </div>
+  </section>
+  <p class="hint">Next: → , Space or Page Down (presentation clickers work). Back: ← or Page Up. Restart: Home.</p>
+</div>
+
+<script>
+const PARTS = {
+  a: {
+    sig: "public int bestRound(int numRounds)",
+    task: "Return the round (1 to <code>numRounds</code>) with the highest score, using <code>scoreInRound</code>. On a tie, return the earliest round.",
+    ex: "Scores 12, 30, 30, 8, 19 → returns 2",
+    start: "Read the task together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Set best to 1 and highestScore to 0.", say: "We need to remember two things: the best round, and the score it got." },
+      { t: "For each round from 1 to numRounds:", say: "Visit every round, from the first to the last." },
+      { t: "    Get this round's score once. Save it as score.", say: "Call the method once per round and keep the answer in a variable." },
+      { t: "    If score is MORE than highestScore:", say: "Strictly more. A tie does not count, so the earlier round stays the best." },
+      { t: "        Set highestScore to score and best to this round.", say: "Update both: the new top score and the round it came from." },
+      { t: "        Do not return here. Keep checking.", say: "This is a find-the-best problem. We cannot know the best until every round is checked." },
+      { t: "After the loop, return best (the round, not the score).", say: "The method returns a round number, like 2, not a score, like 30." }
+    ],
+    code: [
+      { t: "public int bestRound(int numRounds)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    int best = 1;", s: 2 },
+      { t: "    int highestScore = 0;", s: 3 },
+      { t: "    for (int round = 1; round <= numRounds; round++)", s: 4 },
+      { t: "    {", s: 4 },
+      { t: "        int score = scoreInRound(round);", s: 5 },
+      { t: "        if (score > highestScore)", s: 6 },
+      { t: "        {", s: 6 },
+      { t: "            highestScore = score;", s: 7 },
+      { t: "            best = round;", s: 8 },
+      { t: "        }", s: 8 },
+      { t: "    }", s: 8 },
+      { t: "    return best;", s: 9 },
+      { t: "}", s: 9 }
+    ],
+    steps: [
+      { maps: [], say: "The header is given. It returns an int: a round number." },
+      { maps: [0], say: "best starts at 1, so a game where no score beats the start still returns round 1." },
+      { maps: [0], say: "highestScore starts at 0. Points in a game are never negative." },
+      { maps: [1], say: "round goes from 1 to numRounds. The <= includes the last round." },
+      { maps: [2], say: "One call per round, stored in score so we can compare it and save it." },
+      { maps: [3], say: "> and not >=. With >=, round 3 would replace round 2 on the tie." },
+      { maps: [4], say: "Remember the new top score." },
+      { maps: [4, 5], say: "Remember the round it happened in. No return here: the loop keeps going." },
+      { maps: [6], say: "Every round has been checked. Return the round. For 12, 30, 30, 8, 19 this is 2." }
+    ]
+  },
+  b: {
+    sig: "public String initials()",
+    task: "Return a new string made of the first letter of each word in <code>teamName</code>. Words are separated by single spaces.",
+    ex: "\"Red River Hawks\" → \"RRH\" · \"Falcons\" → \"F\"",
+    start: "Read the task together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Start result with the first letter of teamName.", say: "The first word has no space in front of it, so take its letter now." },
+      { t: "For each index i from 1 to the last index:", say: "Walk through the rest of the name, one character at a time." },
+      { t: "    If the character just BEFORE i is a space,", say: "A space right before i means i is the start of a new word." },
+      { t: "        add the character at i to result.", say: "Add that one letter to the initials." },
+      { t: "After the loop, return result.", say: "Return once every word has been found." }
+    ],
+    code: [
+      { t: "public String initials()", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    String result = teamName.substring(0, 1);", s: 2 },
+      { t: "    for (int i = 1; i < teamName.length(); i++)", s: 3 },
+      { t: "    {", s: 3 },
+      { t: "        if (teamName.substring(i - 1, i).equals(\" \"))", s: 4 },
+      { t: "        {", s: 4 },
+      { t: "            result += teamName.substring(i, i + 1);", s: 5 },
+      { t: "        }", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    return result;", s: 6 },
+      { t: "}", s: 6 }
+    ],
+    steps: [
+      { maps: [], say: "The header is given. It returns a String: the initials." },
+      { maps: [0], say: "substring(0, 1) is the first letter. For \"Red River Hawks\" that is \"R\"." },
+      { maps: [1], say: "Start at 1 because we look back at i - 1. Stop before length(), the last index is length() - 1." },
+      { maps: [2], say: "substring(i - 1, i) is the character before i. Compare strings with .equals, never ==." },
+      { maps: [3], say: "substring(i, i + 1) is the letter at i. += adds it to the end of result." },
+      { maps: [4], say: "Return after the loop. \"Red River Hawks\" gives \"RRH\"." }
+    ]
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+let part = "a";
+let step = 0;
+let showAll = false;
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function highlight(src) {
+  return esc(src).replace(/("[^"]*")|\b(public|int|for|if|return|String)\b|\b(\d+)\b/g, (m, str, kw, num) => {
+    if (str) return '<span class="str">' + str + "</span>";
+    if (kw) return '<span class="kw">' + kw + "</span>";
+    return '<span class="num">' + num + "</span>";
+  });
+}
+function total(p) { return 1 + p.pseudo.length + p.steps.length; }
+
+function renderStatic() {
+  const p = PARTS[part];
+  $("task").innerHTML = '<span class="sig">' + esc(p.sig) + '</span><span>' + p.task + '</span><span class="ex">' + esc(p.ex) + "</span>";
+  $("pseudo").innerHTML = p.pseudo.map((l, i) =>
+    '<div class="ln" data-i="' + i + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + esc(l.t) + "</span></div>").join("");
+  $("code").innerHTML = p.code.map((l, i) =>
+    '<div class="ln" data-s="' + l.s + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + highlight(l.t) + "</span></div>").join("");
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.part === part)));
+}
+
+function render() {
+  const p = PARTS[part];
+  const nP = p.pseudo.length, nC = p.steps.length, last = total(p) - 1;
+  if (showAll) step = last;
+  const pseudoShown = Math.min(step, nP);
+  const codeStep = Math.max(0, step - nP);
+
+  document.querySelectorAll("#pseudo .ln").forEach((el) => {
+    const i = Number(el.dataset.i);
+    el.classList.toggle("pending", i >= pseudoShown);
+    el.classList.toggle("now", !showAll && codeStep === 0 && i === pseudoShown - 1);
+    const linked = !showAll && codeStep > 0 && p.steps[codeStep - 1].maps.includes(i);
+    el.classList.toggle("linked", linked);
+  });
+  document.querySelectorAll("#code .ln").forEach((el) => {
+    const s = Number(el.dataset.s);
+    el.classList.toggle("pending", s > codeStep);
+    el.classList.toggle("now", !showAll && s === codeStep);
+    el.classList.remove("linked");
+  });
+
+  let where, say;
+  if (showAll) { where = "Full solution"; say = "Everything is showing. Press Restart to step through again."; }
+  else if (step === 0) { where = "The task"; say = p.start; }
+  else if (codeStep === 0) { where = "Pseudocode · line " + step + " of " + nP; say = p.pseudo[step - 1].say; }
+  else { where = "Java · step " + codeStep + " of " + nC; say = p.steps[codeStep - 1].say; }
+  $("where").textContent = where;
+  $("say").textContent = say;
+  $("pseudo-count").textContent = pseudoShown + " / " + nP;
+  $("code-count").textContent = codeStep + " / " + nC;
+  $("counter").textContent = "Step " + step + " of " + last;
+  $("back").disabled = step === 0;
+  $("next").disabled = step === last;
+  $("all").textContent = showAll ? "Step mode" : "Show all";
+
+  const now = document.querySelector(".ln.now");
+  if (now && now.scrollIntoView) now.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function go(d) {
+  const last = total(PARTS[part]) - 1;
+  showAll = false;
+  step = Math.max(0, Math.min(last, step + d));
+  render();
+}
+function setPart(p, fromHash) {
+  if (!PARTS[p]) p = "a";
+  part = p; step = 0; showAll = false;
+  if (!fromHash) { try { history.replaceState(null, "", "#part-" + p); } catch (e) { location.hash = "part-" + p; } }
+  renderStatic(); render();
+}
+
+$("next").addEventListener("click", () => go(1));
+$("back").addEventListener("click", () => go(-1));
+$("restart").addEventListener("click", () => { showAll = false; step = 0; render(); });
+$("all").addEventListener("click", () => { if (showAll) { showAll = false; step = 0; } else { showAll = true; } render(); });
+$("full").addEventListener("click", () => {
+  const el = document.documentElement;
+  try {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  } catch (e) {}
+});
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setPart(t.dataset.part)));
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) {
+    if (e.key === "Enter" && e.target.tagName === "BUTTON") return;
+    e.preventDefault(); go(1);
+  } else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(-1); }
+  else if (e.key === "Home") { e.preventDefault(); showAll = false; step = 0; render(); }
+});
+function fromHash() { const m = location.hash.match(/^#part-(a|b)$/); setPart(m ? m[1] : "a", true); }
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
