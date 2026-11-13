@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>String Methods Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #eef1f6; --surface: #ffffff; --ink: #1b2232; --muted: #5a6478; --rule: #d7dde8; --accent: #2c56c9;
+  --code-bg: #f4f6fb; --method: #8a3fb8; --str: #1d7a52; --num: #b5531c; --comment: #6b7487;
+  --good: #1d7a52; --good-bg: #e3f4ec; --bad: #b53a2a; --bad-bg: #fbe9e6; --tip-bg: #fff4d6; --tip-rule: #e2b43c;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245; --accent: #8eaeff;
+    --code-bg: #121826; --method: #d29bf5; --str: #7fd6a8; --num: #f3a66f; --comment: #8590a6;
+    --good: #7fd6a8; --good-bg: #16302a; --bad: #f29b8c; --bad-bg: #3a1f1c; --tip-bg: #33290f; --tip-rule: #b8902a;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 18px; line-height: 1.5;
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+a.home { color: var(--accent); font-weight: 700; text-decoration: none; }
+h1 { margin: 0; font-size: 1.8em; line-height: 1.2; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); }
+.tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--rule); }
+.tab {
+  font: inherit; font-weight: 700; padding: 10px 18px; border: 2px solid transparent; border-bottom: none;
+  border-radius: 10px 10px 0 0; background: none; color: var(--muted); cursor: pointer; margin-bottom: -2px;
+}
+.tab[aria-selected="true"] { background: var(--surface); color: var(--accent); border-color: var(--rule); border-bottom: 2px solid var(--surface); }
+.panel[hidden] { display: none; }
+.card { background: var(--surface); border: 2px solid var(--rule); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+code, .code { font-family: var(--font-code); font-size: 0.9em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+h2 { margin: 0; font-size: 1.3em; }
+h3 { margin: 0; font-size: 1.05em; }
+p { margin: 0; }
+
+/* Meet the methods */
+.facts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.fact { background: var(--code-bg); border-radius: 10px; padding: 12px 14px; }
+.fact b { color: var(--accent); }
+.mlist { display: flex; flex-direction: column; gap: 12px; }
+.method { display: flex; flex-direction: column; gap: 8px; }
+.sig { font-family: var(--font-code); font-weight: 700; color: var(--method); font-size: 1.05em; overflow-wrap: anywhere; }
+.ex { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-family: var(--font-code); font-size: 0.9em; background: var(--code-bg); border-radius: 8px; padding: 8px 12px; }
+.ex .arrow { color: var(--muted); }
+.ex .out { font-weight: 700; color: var(--str); }
+.letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell { display: flex; flex-direction: column; align-items: center; min-width: 40px; border: 2px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.cell .ch { font-family: var(--font-code); font-weight: 700; font-size: 1.15em; padding: 4px 8px; }
+.cell .ix { font-family: var(--font-code); font-size: 0.75em; color: var(--muted); background: var(--code-bg); width: 100%; text-align: center; }
+.cell.on { border-color: var(--accent); }
+.cell.on .ch { background: var(--accent); color: var(--surface); }
+.go { align-self: flex-start; font: inherit; font-weight: 700; padding: 10px 20px; border-radius: 10px; border: none; background: var(--accent); color: var(--surface); cursor: pointer; }
+
+/* Practice */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.count { font-weight: 700; color: var(--muted); }
+.score { font-weight: 700; color: var(--good); }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: var(--rule); border: none; padding: 0; cursor: pointer; }
+.dot.here { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dot.right { background: var(--good); }
+.dot.tried { background: var(--tip-rule); }
+.story { font-size: 1.08em; }
+.header { font-family: var(--font-code); font-size: 0.9em; background: var(--code-bg); border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 6px; overflow-x: auto; white-space: pre; }
+.sample { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.sample span { background: var(--code-bg); border-radius: 8px; padding: 6px 12px; font-family: var(--font-code); font-size: 0.9em; }
+.ask { font-weight: 700; }
+.opts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.opt {
+  font: inherit; font-family: var(--font-code); font-size: 0.95em; font-weight: 700; text-align: left;
+  display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 10px;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer;
+}
+.opt:hover:not(:disabled), .opt:focus-visible { border-color: var(--accent); outline: none; }
+.opt .k { font-family: var(--font-text); font-size: 0.8em; color: var(--muted); border: 1px solid var(--rule); border-radius: 5px; padding: 0 6px; }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.right { border-color: var(--good); background: var(--good-bg); }
+.opt:disabled { cursor: default; }
+.feedback { border-radius: 10px; padding: 12px 14px; }
+.feedback.bad { background: var(--bad-bg); border-left: 5px solid var(--bad); }
+.feedback.good { background: var(--good-bg); border-left: 5px solid var(--good); }
+.feedback .fbh { display: block; margin-bottom: 2px; font-weight: 700; }
+.reveal { display: flex; flex-direction: column; gap: 14px; }
+.reveal[hidden] { display: none; }
+.step-h { font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.85em; }
+.java { background: var(--code-bg); border-radius: 10px; padding: 12px 0; overflow-x: auto; }
+.line { display: grid; grid-template-columns: minmax(0, max-content) 1fr; gap: 0 18px; padding: 3px 16px; align-items: baseline; }
+.line .src { font-family: var(--font-code); font-size: 0.9em; white-space: pre; }
+.line .cm { font-size: 0.85em; color: var(--comment); }
+.line.hot { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.tok-m { color: var(--method); font-weight: 700; }
+.tok-s { color: var(--str); }
+.tok-n { color: var(--num); }
+.tok-k { color: var(--accent); font-weight: 700; }
+.trace { display: flex; flex-direction: column; gap: 6px; }
+.trace div { font-family: var(--font-code); font-size: 0.88em; background: var(--code-bg); border-radius: 8px; padding: 6px 12px; overflow-wrap: anywhere; }
+.tip { background: var(--tip-bg); border-left: 5px solid var(--tip-rule); border-radius: 10px; padding: 12px 14px; }
+.nav { display: flex; justify-content: space-between; gap: 10px; }
+.nav button { font: inherit; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+.nav button.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.nav button:disabled { opacity: 0.45; cursor: default; }
+.done { text-align: center; align-items: center; }
+.how { margin: 0; color: var(--muted); font-size: 0.9em; }
+kbd { font-family: var(--font-code); font-size: 0.85em; border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; background: var(--surface); }
+@media (max-width: 560px) {
+  .line { grid-template-columns: 1fr; }
+  .line .cm { padding-left: 2ch; }
+}
+</style>
+</head>
+<body>
+<main>
+  <a class="home" href="index.html">← All walkthroughs</a>
+  <h1>String Methods: Which One, and How?</h1>
+  <p class="lead">FRQ 1(b) always uses String methods. First meet the methods, then practice: read a scenario, pick the method, and see how it goes inside a method.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-meet" aria-controls="meet" aria-selected="true">1. Meet the methods</button>
+    <button class="tab" role="tab" id="tab-practice" aria-controls="practice" aria-selected="false">2. Practice</button>
+  </div>
+
+  <section class="panel" id="meet" role="tabpanel" aria-labelledby="tab-meet">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <h2>Three facts first</h2>
+        <div class="facts">
+          <div class="fact"><b>Counting starts at 0.</b> The first letter is at index 0.</div>
+          <div class="fact"><b>The last letter is at</b> <code>length() - 1</code>.</div>
+          <div class="fact"><b>Methods never change the String.</b> They give you a new value, so save it or return it.</div>
+        </div>
+        <div class="letters" aria-label="The word Panthers with index numbers 0 to 7">
+          <div class="cell"><span class="ch">P</span><span class="ix">0</span></div>
+          <div class="cell"><span class="ch">a</span><span class="ix">1</span></div>
+          <div class="cell"><span class="ch">n</span><span class="ix">2</span></div>
+          <div class="cell"><span class="ch">t</span><span class="ix">3</span></div>
+          <div class="cell"><span class="ch">h</span><span class="ix">4</span></div>
+          <div class="cell"><span class="ch">e</span><span class="ix">5</span></div>
+          <div class="cell"><span class="ch">r</span><span class="ix">6</span></div>
+          <div class="cell"><span class="ch">s</span><span class="ix">7</span></div>
+        </div>
+        <p class="lead">All the examples below use <code>String team = "Panthers";</code></p>
+      </div>
+      <div class="mlist" id="mlist"></div>
+      <button class="go" id="start">Start practicing →</button>
+    </div>
+  </section>
+
+  <section class="panel" id="practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="bar">
+        <span class="count" id="count"></span>
+        <span class="score" id="score"></span>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="card" id="qcard"></div>
+      <div class="nav">
+        <button id="prev">← Back</button>
+        <button id="next" class="primary">Next scenario →</button>
+      </div>
+      <p class="how">Pick with the mouse or press <kbd>1</kbd>–<kbd>4</kbd>. Use <kbd>→</kbd> for the next scenario and <kbd>←</kbd> to go back.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const METHODS = [
+  { sig: 'length()', gives: 'an int', plain: 'Counts the letters (and spaces and symbols).', ex: 'team.length()', out: '8', hi: [] },
+  { sig: 'substring(from, to)', gives: 'a String', plain: 'Copies a piece. Starts AT from and stops just BEFORE to. The letter at to is not included.', ex: 'team.substring(0, 3)', out: '"Pan"', hi: [0,1,2] },
+  { sig: 'substring(from)', gives: 'a String', plain: 'Copies from that spot all the way to the end.', ex: 'team.substring(4)', out: '"hers"', hi: [4,5,6,7] },
+  { sig: 'substring(i, i + 1)', gives: 'a String', plain: 'The one-letter trick: gives you just the letter at index i. Use it in loops.', ex: 'team.substring(3, 4)', out: '"t"', hi: [3] },
+  { sig: 'indexOf(str)', gives: 'an int', plain: 'Tells you WHERE str starts. Gives -1 if it is not there.', ex: 'team.indexOf("the")', out: '3', ex2: 'team.indexOf("cat")', out2: '-1', hi: [3,4,5] },
+  { sig: 'equals(other)', gives: 'true or false', plain: 'Checks if two Strings have exactly the same letters. Use this, never ==.', ex: 'team.equals("Panthers")', out: 'true', ex2: 'team.equals("panthers")', out2: 'false (capital P matters)', hi: [] },
+  { sig: 'compareTo(other)', gives: 'an int', plain: 'Puts two Strings in alphabetical order. Negative = comes before. 0 = the same. Positive = comes after.', ex: '"Bears".compareTo(team)', out: 'a negative number (B comes before P)', hi: [] },
+  { sig: 'split(del)', gives: 'a String[] array', plain: 'Cuts the String at every del and gives back an array of the pieces. The del is thrown away.', ex: '"red,green,blue".split(",")', out: '{"red", "green", "blue"}', hi: [] },
+  { sig: '+', gives: 'a String', plain: 'Not a method, but you need it: glues Strings together.', ex: 'team.substring(0, 1) + "!"', out: '"P!"', hi: [0] }
+];
+
+// Each scenario: story, header, sample, options (4), why, code [src, comment], trace, tip
+const S = [
+  { tag: 'length',
+    story: 'A website says a password must have <b>at least 8 characters</b>. Check if the password is long enough.',
+    header: 'public boolean isLongEnough(String password)',
+    sample: ['password = "tiger42"', 'should return false'],
+    options: [
+      { t: 'length()', ok: true },
+      { t: 'indexOf(str)', why: 'indexOf finds WHERE something is. We need HOW MANY characters there are.' },
+      { t: 'substring(from, to)', why: 'substring copies a piece of the String. We are not cutting anything, we are counting.' },
+      { t: 'equals(other)', why: 'equals checks if two Strings match. We need a number to compare with 8.' }
+    ],
+    why: '“How many characters?” is always <code>length()</code>. It gives back a number, so you can compare it with 8.',
+    code: [
+      ['return password.length() >= 8;', 'count the characters, then check if there are 8 or more']
+    ],
+    trace: ['password.length() → "tiger42" has 7 characters → 7', '7 >= 8 → false'],
+    tip: 'Strings use <code>length()</code> WITH parentheses. Arrays use <code>.length</code> with NO parentheses.'
+  },
+  { tag: 'substring(from, to)',
+    story: 'The scoreboard only has room for the <b>first 3 letters</b> of each team name.',
+    header: 'public String abbreviate(String team)',
+    sample: ['team = "Panthers"', 'should return "Pan"'],
+    options: [
+      { t: 'substring(from)', why: 'With one number, substring goes all the way to the END. We only want 3 letters.' },
+      { t: 'substring(from, to)', ok: true },
+      { t: 'split(del)', why: 'split cuts at a separator like a comma or space. "Panthers" has no separator.' },
+      { t: 'length()', why: 'length tells you how many letters there are. It does not give you the letters.' }
+    ],
+    why: 'We want a <b>piece from the middle or start</b>, with a clear start and stop. That is <code>substring(from, to)</code>.',
+    code: [
+      ['return team.substring(0, 3);', 'start at index 0, stop BEFORE index 3']
+    ],
+    trace: ['indexes 0, 1, 2 → "P", "a", "n"', 'index 3 is NOT included → "Pan"'],
+    tip: 'Quick check: <code>to - from</code> = how many letters you get. Here 3 - 0 = 3 letters.'
+  },
+  { tag: 'substring(from)',
+    story: 'A hashtag like <code>"#goteam"</code> should be shown <b>without the #</b>.',
+    header: 'public String removeHash(String tag)',
+    sample: ['tag = "#goteam"', 'should return "goteam"'],
+    options: [
+      { t: 'substring(from)', ok: true },
+      { t: 'equals(other)', why: 'equals only answers true or false. We need a new String back.' },
+      { t: 'indexOf(str)', why: 'We already know the # is at index 0, so we do not need to search for it.' },
+      { t: 'compareTo(other)', why: 'compareTo is for alphabetical order. That is not what we need here.' }
+    ],
+    why: 'We want <b>everything after the first character</b>, to the end. One number in substring means “from here to the end.”',
+    code: [
+      ['return tag.substring(1);', 'start at index 1 and keep going to the end']
+    ],
+    trace: ['"#" is at index 0, "g" is at index 1', 'tag.substring(1) → "goteam"'],
+    tip: '<code>substring(1)</code> is the same as <code>substring(1, tag.length())</code>. The short way is easier.'
+  },
+  { tag: 'indexOf',
+    story: 'A teacher wants to know if a message <b>mentions “test” anywhere</b>.',
+    header: 'public boolean mentionsTest(String message)',
+    sample: ['message = "Is there a test Friday?"', 'should return true'],
+    options: [
+      { t: 'equals(other)', why: 'equals checks the WHOLE message. The message is not just "test". It only has "test" inside it.' },
+      { t: 'indexOf(str)', ok: true },
+      { t: 'length()', why: 'length counts characters. It cannot tell you what words are inside.' },
+      { t: 'substring(from)', why: 'substring copies a piece, but you would first need to know where "test" is.' }
+    ],
+    why: '“Is it <b>anywhere</b> inside?” means <code>indexOf</code>. If it gives -1, the word is not there. Any other number means it was found.',
+    code: [
+      ['return message.indexOf("test") != -1;', 'not -1 means it was found']
+    ],
+    trace: ['message.indexOf("test") → 11', '11 != -1 → true'],
+    tip: 'indexOf gives a <b>number</b>, not true/false. You must compare it: <code>!= -1</code> or <code>>= 0</code>.'
+  },
+  { tag: 'equals',
+    story: 'A sign-up form asks “Will you come to the game?” Return true only if the answer is exactly <code>"yes"</code>.',
+    header: 'public boolean saidYes(String answer)',
+    sample: ['answer = "yes"', 'should return true'],
+    options: [
+      { t: 'answer == "yes"', why: '== checks if they are the SAME OBJECT in memory, not the same letters. It can give false even when the letters match.' },
+      { t: 'indexOf(str)', why: 'indexOf would also say yes to "yesterday". We need an exact match.' },
+      { t: 'equals(other)', ok: true },
+      { t: 'compareTo(other)', why: 'compareTo(...) == 0 would work, but equals is the clear, simple choice for “are they the same?”' }
+    ],
+    why: '“Are these two Strings <b>exactly the same</b>?” is always <code>equals</code>.',
+    code: [
+      ['return answer.equals("yes");', 'true only if every letter matches']
+    ],
+    trace: ['"yes".equals("yes") → true', '"Yes".equals("yes") → false (capital Y is different)'],
+    tip: 'Never use <code>==</code> to compare Strings. Use <code>equals</code>. To check “not the same,” use <code>!answer.equals("yes")</code>.'
+  },
+  { tag: 'compareTo',
+    story: 'Two students line up in <b>alphabetical order</b>. Return the name that goes first.',
+    header: 'public String firstInLine(String a, String b)',
+    sample: ['a = "Maya", b = "Leo"', 'should return "Leo"'],
+    options: [
+      { t: 'equals(other)', why: 'equals only tells you if they are the same. It cannot tell you which one comes first.' },
+      { t: 'length()', why: 'Shorter is not the same as first in ABC order. "Al" vs "Bo" are the same length.' },
+      { t: 'indexOf(str)', why: 'indexOf searches inside a String. It does not compare the order of two names.' },
+      { t: 'compareTo(other)', ok: true }
+    ],
+    why: '“Which comes first in <b>ABC order</b>?” is <code>compareTo</code>. A negative answer means the first one comes before the second.',
+    code: [
+      ['if (a.compareTo(b) < 0)', 'negative → a comes before b'],
+      ['{', ''],
+      ['    return a;', ''],
+      ['}', ''],
+      ['return b;', 'otherwise b goes first']
+    ],
+    trace: ['"Maya".compareTo("Leo") → positive (M comes after L)', 'positive is not < 0 → return b → "Leo"'],
+    tip: 'compareTo gives a <b>number</b>. Always compare it with 0: <code>&lt; 0</code> before, <code>== 0</code> same, <code>&gt; 0</code> after.'
+  },
+  { tag: 'split',
+    story: 'A list of colors is saved like <code>"red,green,blue"</code>. Return <b>how many colors</b> are in the list.',
+    header: 'public int countColors(String list)',
+    sample: ['list = "red,green,blue"', 'should return 3'],
+    options: [
+      { t: 'length()', why: 'list.length() counts every letter and comma (14). We want the number of colors.' },
+      { t: 'split(del)', ok: true },
+      { t: 'substring(from, to)', why: 'You would need many substrings and indexOf calls. split does it in one step.' },
+      { t: 'equals(other)', why: 'equals answers true or false. We need to cut the list into pieces.' }
+    ],
+    why: 'The pieces are <b>separated by commas</b>. <code>split(",")</code> cuts at every comma and puts the pieces in an array. Then count the array.',
+    code: [
+      ['String[] colors = list.split(",");', 'cut at every comma'],
+      ['return colors.length;', 'how many pieces are in the array']
+    ],
+    trace: ['list.split(",") → {"red", "green", "blue"}', 'colors.length → 3'],
+    tip: 'split gives back an <b>array</b>, so save it in a <code>String[]</code>. The commas are gone from the pieces.'
+  },
+  { tag: 'substring(i, i + 1) + equals',
+    story: 'Count how many times the letter <code>"a"</code> appears in a word.',
+    header: 'public int countA(String word)',
+    sample: ['word = "banana"', 'should return 3'],
+    options: [
+      { t: 'indexOf("a")', why: 'indexOf only finds the FIRST "a". We need to count all of them.' },
+      { t: 'word.equals("a")', why: 'That checks if the WHOLE word is "a". We need to look at each letter.' },
+      { t: 'substring(i, i + 1) + equals', ok: true },
+      { t: 'split(del)', why: 'There is no separator between letters. We need to visit each letter one at a time.' }
+    ],
+    why: 'To look at <b>each letter</b>, loop through the word. <code>substring(i, i + 1)</code> gives the one letter at i. Then <code>equals</code> checks if it is "a".',
+    code: [
+      ['int count = 0;', 'start counting at 0'],
+      ['for (int i = 0; i < word.length(); i++)', 'visit every index'],
+      ['{', ''],
+      ['    String letter = word.substring(i, i + 1);', 'the ONE letter at i'],
+      ['    if (letter.equals("a"))', 'is it an "a"?'],
+      ['    {', ''],
+      ['        count++;', 'yes → add 1'],
+      ['    }', ''],
+      ['}', ''],
+      ['return count;', '']
+    ],
+    trace: ['i = 0 "b" no · i = 1 "a" yes (1) · i = 2 "n" no', 'i = 3 "a" yes (2) · i = 4 "n" no · i = 5 "a" yes (3)', 'return 3'],
+    tip: 'Loop with <code>i &lt; word.length()</code>. The last i is 5, and <code>substring(5, 6)</code> is fine.'
+  },
+  { tag: 'last letter',
+    story: 'Check if a word <b>ends with the letter "s"</b>.',
+    header: 'public boolean endsWithS(String word)',
+    sample: ['word = "cats"', 'should return true'],
+    options: [
+      { t: 'word.substring(word.length())', why: 'The last index is length() - 1. Starting at length() gives an empty String "".' },
+      { t: 'word.indexOf("s") != -1', why: 'That checks for an "s" ANYWHERE. "sun" would say true, but it does not end in s.' },
+      { t: 'word.equals("s")', why: 'That checks if the whole word is just "s".' },
+      { t: 'word.substring(word.length() - 1)', ok: true }
+    ],
+    why: 'The <b>last letter</b> is at index <code>length() - 1</code>. substring from there to the end gives just that letter. Then check it with equals.',
+    code: [
+      ['String last = word.substring(word.length() - 1);', 'the last letter'],
+      ['return last.equals("s");', 'is it "s"?']
+    ],
+    trace: ['word.length() → 4, so the last index is 3', 'word.substring(3) → "s"', '"s".equals("s") → true'],
+    tip: 'Last letter: <code>substring(length() - 1)</code>. First letter: <code>substring(0, 1)</code>.'
+  },
+  { tag: 'indexOf + substring',
+    story: 'A school email looks like <code>"maya@school.org"</code>. Return the <b>username</b>: everything before the @.',
+    header: 'public String username(String email)',
+    sample: ['email = "maya@school.org"', 'should return "maya"'],
+    options: [
+      { t: 'substring(0, 4)', why: 'That only works for "maya". "jonathan@school.org" has a longer name. Never hard-code the number.' },
+      { t: 'indexOf + substring', ok: true },
+      { t: 'equals(other)', why: 'equals answers true or false. We need part of the email back.' },
+      { t: 'length()', why: 'length counts all the characters, including the @ and the school part.' }
+    ],
+    why: 'We do not know where the @ is, so we <b>find it first</b> with indexOf. Then substring stops right there.',
+    code: [
+      ['int at = email.indexOf("@");', 'find where the @ is'],
+      ['return email.substring(0, at);', 'from the start up to (not including) the @']
+    ],
+    trace: ['email.indexOf("@") → 4', 'email.substring(0, 4) → "maya"'],
+    tip: 'This is the most common FRQ 1(b) move: <b>find it with indexOf, cut with substring</b>.'
+  },
+  { tag: 'indexOf + substring(from)',
+    story: 'Now return the <b>school part</b> of the email: everything after the @.',
+    header: 'public String domain(String email)',
+    sample: ['email = "maya@school.org"', 'should return "school.org"'],
+    options: [
+      { t: 'email.substring(email.indexOf("@"))', why: 'Close! But that starts AT the @, so you get "@school.org".' },
+      { t: 'email.split("@")', why: 'split gives back an ARRAY, not a String. You would still need [1] to get the piece.' },
+      { t: 'email.substring(email.indexOf("@") + 1)', ok: true },
+      { t: 'email.substring(5, 15)', why: 'Hard-coded numbers only work for this one email. Use indexOf so it works for any email.' }
+    ],
+    why: 'Find the @, then <b>start one spot after it</b> and go to the end.',
+    code: [
+      ['int at = email.indexOf("@");', 'find the @ → 4'],
+      ['return email.substring(at + 1);', 'start one after the @, go to the end']
+    ],
+    trace: ['email.indexOf("@") → 4', 'email.substring(5) → "school.org"'],
+    tip: 'The <code>+ 1</code> skips over the @. Forgetting it is a very common mistake.'
+  },
+  { tag: 'split + [0]',
+    story: 'Return the <b>first word</b> of a sentence. Words are separated by single spaces.',
+    header: 'public String firstWord(String sentence)',
+    sample: ['sentence = "Good morning class"', 'should return "Good"'],
+    options: [
+      { t: 'sentence.split(" ")[0]', ok: true },
+      { t: 'sentence.substring(0, 4)', why: 'That only works when the first word has 4 letters. Never hard-code the number.' },
+      { t: 'sentence.indexOf(" ")', why: 'That gives the POSITION of the space (4), not the word.' },
+      { t: 'sentence.split(" ")', why: 'That gives the whole array of words. You still need to pick out the first one.' }
+    ],
+    why: 'Words are <b>separated by spaces</b>, so <code>split(" ")</code> gives an array of words. The first word is at index 0.',
+    code: [
+      ['String[] words = sentence.split(" ");', 'cut at every space'],
+      ['return words[0];', 'the first piece']
+    ],
+    trace: ['sentence.split(" ") → {"Good", "morning", "class"}', 'words[0] → "Good"'],
+    tip: 'This also works: <code>sentence.substring(0, sentence.indexOf(" "))</code>. But if the sentence is one word, like "Hello", indexOf gives -1 and the code crashes. split still works: it gives "Hello".'
+  },
+  { tag: 'substring + "+"',
+    story: 'Make a student’s <b>initials</b> from their first and last name.',
+    header: 'public String initials(String first, String last)',
+    sample: ['first = "Maya", last = "Lopez"', 'should return "ML"'],
+    options: [
+      { t: 'first.substring(0, 1) + last.substring(0, 1)', ok: true },
+      { t: 'first.substring(1) + last.substring(1)', why: 'substring(1) starts at index 1 and goes to the END: "aya" + "opez".' },
+      { t: 'first.indexOf(0) + last.indexOf(0)', why: 'indexOf searches for text. It does not get the letter at an index.' },
+      { t: 'first.equals(last)', why: 'equals compares the two names. It does not build anything new.' }
+    ],
+    why: 'The <b>first letter</b> of each name is <code>substring(0, 1)</code>. Then <code>+</code> glues them together.',
+    code: [
+      ['String a = first.substring(0, 1);', 'first letter of the first name'],
+      ['String b = last.substring(0, 1);', 'first letter of the last name'],
+      ['return a + b;', 'glue them together']
+    ],
+    trace: ['"Maya".substring(0, 1) → "M"', '"Lopez".substring(0, 1) → "L"', '"M" + "L" → "ML"'],
+    tip: 'Building a new String? Use substrings and glue them with <code>+</code>.'
+  },
+  { tag: 'substring + substring',
+    story: 'Remove the letter at index <code>i</code> from a word. Keep everything else.',
+    header: 'public String removeAt(String word, int i)',
+    sample: ['word = "chart", i = 2', 'should return "chrt"'],
+    options: [
+      { t: 'word.substring(0, i) + word.substring(i)', why: 'substring(i) starts AT i, so the letter is still there: "ch" + "art" = "chart".' },
+      { t: 'word.substring(0, i) + word.substring(i + 1)', ok: true },
+      { t: 'word.substring(i, i + 1)', why: 'That gives back ONLY the letter we want to remove ("a").' },
+      { t: 'word.split("a")', why: 'split removes EVERY "a", gives an array, and only works for the letter a.' }
+    ],
+    why: 'Take the part <b>before i</b> and the part <b>after i</b>, and glue them. The letter at i is skipped.',
+    code: [
+      ['String before = word.substring(0, i);', 'everything before index i'],
+      ['String after = word.substring(i + 1);', 'everything after index i'],
+      ['return before + after;', 'glue them, skipping the letter at i']
+    ],
+    trace: ['word.substring(0, 2) → "ch"', 'word.substring(3) → "rt"', '"ch" + "rt" → "chrt"'],
+    tip: 'Before i: <code>substring(0, i)</code>. After i: <code>substring(i + 1)</code>. Remember this pair.'
+  },
+  { tag: 'indexOf + substring + length',
+    story: 'A chat app hides a bad word. Replace the <b>first</b> time <code>bad</code> appears with <code>"***"</code>. If it is not there, return the message unchanged.',
+    header: 'public String hideWord(String message, String bad)',
+    sample: ['message = "you are mean today", bad = "mean"', 'should return "you are *** today"'],
+    options: [
+      { t: 'equals(other)', why: 'equals checks the whole message. We need to find the word inside it.' },
+      { t: 'split(del)', why: 'split would throw away every copy of the word and give an array. We only want to replace the first one.' },
+      { t: 'substring only', why: 'We do not know where the word is or how long it is. We need indexOf and length() too.' },
+      { t: 'indexOf + substring + length()', ok: true }
+    ],
+    why: 'This is a full FRQ 1(b)! <b>indexOf</b> finds the word. <b>length()</b> tells us how long it is so we can skip it. <b>substring</b> keeps the part before and the part after.',
+    code: [
+      ['int pos = message.indexOf(bad);', 'where does the bad word start?'],
+      ['if (pos == -1)', 'not found?'],
+      ['{', ''],
+      ['    return message;', 'then nothing to hide'],
+      ['}', ''],
+      ['String before = message.substring(0, pos);', 'the part before the word'],
+      ['String after = message.substring(pos + bad.length());', 'skip the whole word, keep the rest'],
+      ['return before + "***" + after;', 'glue it back with *** in the middle']
+    ],
+    trace: ['message.indexOf("mean") → 8', 'message.substring(0, 8) → "you are "', 'bad.length() → 4, so message.substring(12) → " today"', '"you are " + "***" + " today" → "you are *** today"'],
+    tip: 'Skip a whole word with <code>pos + word.length()</code>. And always handle the -1 case before you use pos in substring.'
+  }
+];
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Simple Java highlighter for the short lines we show
+function hl(src) {
+  const re = /("[^"]*")|\b(length|substring|indexOf|equals|compareTo|split)\b(?=\()|\b(int|String|return|if|for|boolean|public)\b|\b(\d+)\b/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    if (m[1]) out += '<span class="tok-s">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-m">' + m[2] + '</span>';
+    else if (m[3]) out += '<span class="tok-k">' + m[3] + '</span>';
+    else out += '<span class="tok-n">' + m[4] + '</span>';
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+// ---- Meet the methods ----
+const letters = ['P','a','n','t','h','e','r','s'];
+$('#mlist').innerHTML = METHODS.map((m) => {
+  const cells = m.hi.length ? '<div class="letters" aria-hidden="true">' + letters.map((c, i) =>
+    '<div class="cell' + (m.hi.includes(i) ? ' on' : '') + '"><span class="ch">' + c + '</span><span class="ix">' + i + '</span></div>').join('') + '</div>' : '';
+  const ex2 = m.ex2 ? '<div class="ex"><span>' + hl(m.ex2) + '</span><span class="arrow">→</span><span class="out">' + esc(m.out2) + '</span></div>' : '';
+  return '<div class="card method"><span class="sig">' + esc(m.sig) + '</span>' +
+    '<p>' + esc(m.plain) + ' <span style="color:var(--muted)">Gives back ' + m.gives + '.</span></p>' +
+    '<div class="ex"><span>' + hl(m.ex) + '</span><span class="arrow">→</span><span class="out">' + esc(m.out) + '</span></div>' + ex2 + cells + '</div>';
+}).join('');
+
+// ---- Tabs ----
+function showTab(which) {
+  ['meet', 'practice'].forEach((id) => {
+    $('#' + id).hidden = id !== which;
+    $('#tab-' + id).setAttribute('aria-selected', String(id === which));
+  });
+}
+$('#tab-meet').onclick = () => showTab('meet');
+$('#tab-practice').onclick = () => showTab('practice');
+$('#start').onclick = () => { showTab('practice'); window.scrollTo(0, 0); };
+
+// ---- Practice ----
+let cur = 0;
+const state = S.map(() => ({ picks: [], solved: false, firstTry: null }));
+
+function render() {
+  const q = S[cur], st = state[cur];
+  $('#count').textContent = 'Scenario ' + (cur + 1) + ' of ' + S.length;
+  const right = state.filter((s) => s.firstTry === true).length;
+  const done = state.filter((s) => s.solved).length;
+  $('#score').textContent = done ? 'Right on the first try: ' + right + ' of ' + done : '';
+  $('#dots').innerHTML = S.map((_, i) => {
+    const s = state[i];
+    const cls = 'dot' + (i === cur ? ' here' : '') + (s.solved ? (s.firstTry ? ' right' : ' tried') : '');
+    return '<button class="' + cls + '" data-i="' + i + '" aria-label="Scenario ' + (i + 1) + '"></button>';
+  }).join('');
+  document.querySelectorAll('.dot').forEach((d) => d.onclick = () => { cur = +d.dataset.i; render(); });
+
+  let h = '<p class="story">' + q.story + '</p>';
+  h += '<div class="header">' + hl(q.header) + '</div>';
+  h += '<div class="sample"><span>' + esc(q.sample[0]) + '</span><span>' + esc(q.sample[1]) + '</span></div>';
+  h += '<p class="ask">Which String method should you use?</p><div class="opts">';
+  q.options.forEach((o, i) => {
+    let cls = 'opt';
+    if (st.picks.includes(i)) cls += o.ok ? ' right' : ' wrong';
+    h += '<button class="' + cls + '" data-o="' + i + '"' + (st.solved ? ' disabled' : '') + '><span class="k">' + (i + 1) + '</span><span>' + esc(o.t) + '</span></button>';
+  });
+  h += '</div><div id="fb" aria-live="polite">';
+  const lastPick = st.picks[st.picks.length - 1];
+  if (lastPick !== undefined && !q.options[lastPick].ok) {
+    h += '<div class="feedback bad"><span class="fbh">Not this one.</span>' + esc(q.options[lastPick].why) + ' Try again.</div>';
+  }
+  if (st.solved) {
+    h += '<div class="feedback good"><span class="fbh">' + (st.firstTry ? 'Yes! First try.' : 'Yes, that’s the one.') + '</span>' + q.why + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="reveal"' + (st.solved ? '' : ' hidden') + '>';
+  h += '<span class="step-h">How to use it inside the method</span><div class="java">';
+  h += '<div class="line"><span class="src">' + hl(q.header) + '</span><span class="cm"></span></div><div class="line"><span class="src">{</span><span class="cm"></span></div>';
+  q.code.forEach(([src, cm]) => {
+    h += '<div class="line' + (cm ? ' hot' : '') + '"><span class="src">    ' + hl(src) + '</span><span class="cm">' + (cm ? '// ' + esc(cm) : '') + '</span></div>';
+  });
+  h += '<div class="line"><span class="src">}</span><span class="cm"></span></div></div>';
+  h += '<span class="step-h">Try it with the example</span><div class="trace">' + q.trace.map((t) => '<div>' + esc(t) + '</div>').join('') + '</div>';
+  h += '<div class="tip"><b>Watch out:</b> ' + q.tip + '</div></div>';
+  $('#qcard').innerHTML = h;
+
+  document.querySelectorAll('.opt').forEach((b) => b.onclick = () => pick(+b.dataset.o));
+  $('#prev').disabled = cur === 0;
+  $('#next').textContent = cur === S.length - 1 ? 'Finish' : 'Next scenario →';
+}
+
+function pick(i) {
+  const q = S[cur], st = state[cur];
+  if (st.solved || st.picks.includes(i)) return;
+  st.picks.push(i);
+  if (st.firstTry === null) st.firstTry = !!q.options[i].ok;
+  if (q.options[i].ok) st.solved = true;
+  render();
+  if (st.solved) document.querySelector('.reveal').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function finish() {
+  const right = state.filter((s) => s.firstTry === true).length;
+  const done = state.filter((s) => s.solved).length;
+  $('#count').textContent = 'All done!';
+  $('#dots').innerHTML = '';
+  $('#qcard').innerHTML = '<div class="done card" style="border:none;padding:0"><h2>Nice work!</h2>' +
+    '<p>You finished ' + done + ' of ' + S.length + ' scenarios and got <b>' + right + '</b> right on the first try.</p>' +
+    '<p class="lead">Go back to any scenario you missed and read the “Watch out” tip again. Then try an FRQ 1(b).</p>' +
+    '<button class="go" id="again" style="align-self:center">Start over</button></div>';
+  $('#again').onclick = () => { state.forEach((s) => { s.picks = []; s.solved = false; s.firstTry = null; }); cur = 0; render(); };
+  $('#next').textContent = 'Finish';
+}
+
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); window.scrollTo(0, 0); } else finish(); };
+document.addEventListener('keydown', (e) => {
+  if ($('#practice').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key >= '1' && e.key <= '4') pick(+e.key - 1);
+  else if (e.key === 'ArrowRight') $('#next').click();
+  else if (e.key === 'ArrowLeft') $('#prev').click();
+});
+render();
+</script>
+</body>
+</html>
