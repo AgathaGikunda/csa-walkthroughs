@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nov 13th Unit 2 Test Part 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a projector stepper. Task strip on top, pseudocode and Java side by side, one caption bar below. */
+:root {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --ink: #1b2232;
+  --muted: #5a6478;
+  --rule: #d7dde8;
+  --accent: #2c56c9;
+  --hl: #ffe27a;
+  --hl-ink: #1b2232;
+  --link: #dbe6ff;
+  --kw: #2c56c9;
+  --str: #1d7a52;
+  --num: #a24a12;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+    --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+    --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+  --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+  --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-text);
+  font-size: clamp(15px, 1.25vw, 19px); line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  box-sizing: border-box;
+}
+.app { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+.spacer { flex: 1; }
+.counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.task {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline;
+}
+.task code { font-family: var(--font-code); font-size: 0.95em; }
+.sig { font-family: var(--font-code); font-weight: 600; }
+.task .ex { color: var(--muted); }
+
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 14px; flex: 1; }
+@media (max-width: 880px) { .panes { grid-template-columns: minmax(0, 1fr); } }
+.pane { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 0; min-width: 0; display: flex; flex-direction: column; }
+.pane h2 {
+  margin: 0 18px 10px; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.lines { overflow-x: auto; }
+.ln {
+  display: grid; grid-template-columns: 2.6em minmax(0, 1fr); align-items: start;
+  padding: 3px 18px 3px 0; border-left: 5px solid transparent;
+  transition: background-color 0.25s, opacity 0.25s;
+}
+.ln .no { color: var(--muted); text-align: right; padding-right: 0.9em; font-family: var(--font-code); font-size: 0.8em; padding-top: 0.25em; }
+.ln .tx { white-space: pre-wrap; }
+.pseudo .ln { font-size: 1.12em; }
+.java .ln .tx { font-family: var(--font-code); white-space: pre; font-size: 1.02em; }
+.ln.pending { visibility: hidden; }
+.ln.now { background: var(--hl); color: var(--hl-ink); border-left-color: var(--accent); }
+.ln.now .no { color: var(--hl-ink); }
+.ln.linked { background: var(--link); border-left-color: var(--accent); }
+.kw { color: var(--kw); font-weight: 600; }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.ln.now .kw, .ln.now .str, .ln.now .num { color: inherit; }
+
+.caption {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+}
+.caption .where { font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.caption .say { flex: 1 1 320px; font-size: 1.1em; min-width: 0; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-weight: 700; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:focus-visible, .tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hint { color: var(--muted); font-size: 0.85em; }
+@media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>Nov 13th Unit 2 Test Part 1</h1>
+    <div class="tabs" role="tablist" aria-label="Question part">
+      <button class="tab" role="tab" id="tab-1a" data-part="1a" aria-selected="true">1a lapWinner</button>
+      <button class="tab" role="tab" id="tab-1b" data-part="1b" aria-selected="false">1b fastestLap</button>
+      <button class="tab" role="tab" id="tab-2a" data-part="2a" aria-selected="false">2a findFreeBlock</button>
+      <button class="tab" role="tab" id="tab-2b" data-part="2b" aria-selected="false">2b bookRoom</button>
+    </div>
+
+    <div class="spacer"></div>
+    <span class="counter" id="counter" aria-live="polite"></span>
+  </header>
+
+  <section class="task" id="task" aria-label="The task"></section>
+
+  <main class="panes">
+    <section class="pane pseudo" aria-label="Pseudocode">
+      <h2><span>Pseudocode</span><span id="pseudo-count"></span></h2>
+      <div class="lines" id="pseudo"></div>
+    </section>
+    <section class="pane java" aria-label="Java solution">
+      <h2><span>Java solution</span><span id="code-count"></span></h2>
+      <div class="lines" id="code"></div>
+    </section>
+  </main>
+
+  <section class="caption" aria-live="polite">
+    <span class="where" id="where"></span>
+    <span class="say" id="say"></span>
+    <div class="controls">
+      <button class="btn" id="back">← Back</button>
+      <button class="btn primary" id="next">Next →</button>
+      <button class="btn" id="all">Show all</button>
+      <button class="btn" id="restart">Restart</button>
+      <button class="btn" id="full">Full screen</button>
+    </div>
+  </section>
+  <p class="hint">Next: → , Space or Page Down (presentation clickers work). Back: ← or Page Up. Restart: Home.</p>
+</div>
+
+<script>
+const PARTS = {
+  "1a": {
+    sig: "public String lapWinner(int numLaps)",
+    task: "Compare <code>runnerOne</code> and <code>runnerTwo</code> lap by lap, from lap 1 to <code>numLaps</code>. The smaller time wins the lap. Equal times count for nobody. Return <code>\"Runner 1 wins!\"</code>, <code>\"Runner 2 wins!\"</code> or <code>\"Tie!\"</code> for whoever won more laps.",
+    ex: "Runner 1: 62.5, 60.0, 61.0, 60.0 · Runner 2: 61.0, 60.0, 62.0, 60.5 · lapWinner(2) → \"Runner 2 wins!\" · lapWinner(3) → \"Tie!\" · lapWinner(4) → \"Runner 1 wins!\"",
+    start: "Read the rules and the lap table together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Set winsOne and winsTwo to 0.", say: "Two counters, one for each runner." },
+      { t: "For each lap from 1 to numLaps:", say: "Laps start at 1, not 0, and lap numLaps is included." },
+      { t: "    Get both runners' times for this lap.", say: "Ask each runner object for its time with getLapTime." },
+      { t: "    If runner 1's time is smaller, add 1 to winsOne.", say: "Smaller time means faster, so runner 1 wins this lap." },
+      { t: "    Else if runner 2's time is smaller, add 1 to winsTwo.", say: "If the times are equal, neither if is true, so nobody gets the lap." },
+      { t: "After the loop, if winsOne > winsTwo, return \"Runner 1 wins!\".", say: "Decide the winner only AFTER every lap is counted." },
+      { t: "Else if winsTwo > winsOne, return \"Runner 2 wins!\".", say: "Runner 2 won more laps." },
+      { t: "Otherwise, return \"Tie!\".", say: "Same number of laps won." }
+    ],
+    code: [
+      { t: "public String lapWinner(int numLaps)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    int winsOne = 0;", s: 1 },
+      { t: "    int winsTwo = 0;", s: 1 },
+      { t: "    for (int lap = 1; lap <= numLaps; lap++)", s: 2 },
+      { t: "    {", s: 2 },
+      { t: "        double timeOne = runnerOne.getLapTime(lap);", s: 3 },
+      { t: "        double timeTwo = runnerTwo.getLapTime(lap);", s: 3 },
+      { t: "        if (timeOne < timeTwo)", s: 4 },
+      { t: "        {", s: 4 },
+      { t: "            winsOne++;", s: 4 },
+      { t: "        }", s: 4 },
+      { t: "        else if (timeTwo < timeOne)", s: 5 },
+      { t: "        {", s: 5 },
+      { t: "            winsTwo++;", s: 5 },
+      { t: "        }", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    if (winsOne > winsTwo)", s: 6 },
+      { t: "    {", s: 6 },
+      { t: "        return \"Runner 1 wins!\";", s: 6 },
+      { t: "    }", s: 6 },
+      { t: "    else if (winsTwo > winsOne)", s: 7 },
+      { t: "    {", s: 7 },
+      { t: "        return \"Runner 2 wins!\";", s: 7 },
+      { t: "    }", s: 7 },
+      { t: "    return \"Tie!\";", s: 8 },
+      { t: "}", s: 8 }
+    ],
+    steps: [
+      { maps: [0], say: "Two int counters, both start at 0." },
+      { maps: [1], say: "lap starts at 1 and uses <= so the last lap is checked. lap < numLaps would skip the last lap." },
+      { maps: [2], say: "getLapTime returns a double, so save each time in a double. Lap 1: 62.5 and 61.0." },
+      { maps: [3], say: "Lap 3: 61.0 < 62.0, so winsOne goes up. Lap 4: 60.0 < 60.5, winsOne goes up again." },
+      { maps: [4], say: "Lap 1: 61.0 < 62.5, so winsTwo goes up. Lap 2: 60.0 and 60.0 are equal, so nobody gets it. Do not use <= here: a tie would count for someone." },
+      { maps: [5], say: "These returns are AFTER the loop closes. lapWinner(4): winsOne is 2, winsTwo is 1 → \"Runner 1 wins!\"" },
+      { maps: [6], say: "lapWinner(2): winsOne is 0, winsTwo is 1 → \"Runner 2 wins!\"" },
+      { maps: [7], say: "lapWinner(3): 1 lap each → \"Tie!\". Adding up the total times instead of counting laps won is a different (wrong) method." }
+    ]
+  },
+  "1b": {
+    sig: "public int fastestLap(int numLaps)",
+    task: "Return the lap number, from 1 to <code>numLaps</code>, where <code>runnerOne</code> had the smallest time. If two laps tie for fastest, return the earlier lap.",
+    ex: "Runner 1: 62.5, 60.0, 61.0, 60.0 · fastestLap(1) → 1 · fastestLap(3) → 2 · fastestLap(4) → 2",
+    start: "Read the rules and the lap table together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "fastest = 1, best = runner 1's time on lap 1", say: "Start with lap 1 as the best so far. Do NOT start best at 0: no lap time is smaller than 0." },
+      { t: "For each lap from 2 to numLaps:", say: "Lap 1 is already the best so far, so start comparing at lap 2." },
+      { t: "    Get runner 1's time for this lap.", say: "Only runnerOne matters in this part." },
+      { t: "    If this time is smaller than best:", say: "Strictly smaller. That keeps the EARLIER lap when two times tie." },
+      { t: "        best = this time, fastest = this lap", say: "Update both together: the time to compare, and the lap number to return." },
+      { t: "After the loop, return fastest.", say: "Return the lap NUMBER, not the time." }
+    ],
+    code: [
+      { t: "public int fastestLap(int numLaps)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    int fastest = 1;", s: 1 },
+      { t: "    double bestTime = runnerOne.getLapTime(1);", s: 1 },
+      { t: "    for (int lap = 2; lap <= numLaps; lap++)", s: 2 },
+      { t: "    {", s: 2 },
+      { t: "        double time = runnerOne.getLapTime(lap);", s: 3 },
+      { t: "        if (time < bestTime)", s: 4 },
+      { t: "        {", s: 4 },
+      { t: "            bestTime = time;", s: 5 },
+      { t: "            fastest = lap;", s: 5 },
+      { t: "        }", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    return fastest;", s: 6 },
+      { t: "}", s: 6 }
+    ],
+    steps: [
+      { maps: [0], say: "fastest is an int (a lap number). bestTime is a double (a time): 62.5." },
+      { maps: [1], say: "Start at lap 2. If numLaps is 1, the loop never runs and we return 1." },
+      { maps: [2], say: "Lap 2: 60.0. Lap 3: 61.0. Lap 4: 60.0." },
+      { maps: [3], say: "Lap 2: 60.0 < 62.5 yes. Lap 3: 61.0 < 60.0 no. Lap 4: 60.0 < 60.0 no, it is a tie, so lap 2 stays." },
+      { maps: [4], say: "After lap 2: bestTime is 60.0 and fastest is 2." },
+      { maps: [5], say: "fastestLap(4) returns 2. With <= it would wrongly return 4." }
+    ]
+  },
+  "2a": {
+    sig: "public int findFreeBlock(int room, int numSlots)",
+    task: "Slots go from 0 to 11. Return the first slot of the earliest block of <code>numSlots</code> free slots in a row in this room. Return -1 if there is no such block. Use <code>isSlotFree(room, slot)</code>.",
+    ex: "Room 2: X F F X F F F X X F F F (slots 0–11) · findFreeBlock(2, 2) → 1 · findFreeBlock(2, 3) → 4 · findFreeBlock(2, 4) → -1",
+    start: "Read the rules and room 2's slots together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Set run to 0.", say: "run counts how many free slots we have seen IN A ROW." },
+      { t: "For each slot from 0 to 11:", say: "Check every slot in order, so we find the EARLIEST block." },
+      { t: "    If the slot is free, add 1 to run.", say: "One more free slot in a row." },
+      { t: "        If run equals numSlots, return the block's first slot.", say: "The block ends at this slot, so it started at slot - numSlots + 1." },
+      { t: "    Otherwise, set run back to 0.", say: "A taken slot breaks the run. Start counting again." },
+      { t: "After the loop, return -1.", say: "Only after checking every slot can we say there is no block." }
+    ],
+    code: [
+      { t: "public int findFreeBlock(int room, int numSlots)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    int run = 0;", s: 1 },
+      { t: "    for (int slot = 0; slot <= 11; slot++)", s: 2 },
+      { t: "    {", s: 2 },
+      { t: "        if (isSlotFree(room, slot))", s: 3 },
+      { t: "        {", s: 3 },
+      { t: "            run++;", s: 3 },
+      { t: "            if (run == numSlots)", s: 4 },
+      { t: "            {", s: 4 },
+      { t: "                return slot - numSlots + 1;", s: 4 },
+      { t: "            }", s: 4 },
+      { t: "        }", s: 4 },
+      { t: "        else", s: 5 },
+      { t: "        {", s: 5 },
+      { t: "            run = 0;", s: 5 },
+      { t: "        }", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    return -1;", s: 6 },
+      { t: "}", s: 6 }
+    ],
+    steps: [
+      { maps: [0], say: "No free slots counted yet." },
+      { maps: [1], say: "Slots are 0 to 11, so use <= 11 (or < 12)." },
+      { maps: [2], say: "isSlotFree is a method in this class, so call it directly with room and slot. findFreeBlock(2, 3): slot 1 → run 1, slot 2 → run 2." },
+      { maps: [3], say: "Slot 6 makes run 3, which equals numSlots. Return 6 - 3 + 1 = 4. Returning slot (6) would give the END of the block, not the start." },
+      { maps: [4], say: "Slot 3 is taken, so run goes back to 0 before slot 4. Without this reset, slots 1, 2 and 4 would wrongly count as 3 in a row." },
+      { maps: [5], say: "return -1 goes AFTER the loop. Inside an else, it would stop at the first taken slot. findFreeBlock(2, 4) → -1." }
+    ]
+  },
+  "2b": {
+    sig: "public int bookRoom(int firstRoom, int lastRoom, int numSlots)",
+    task: "Check rooms <code>firstRoom</code> to <code>lastRoom</code> in order. In the first room that has a free block of <code>numSlots</code>, reserve the earliest block and return that room number. If no room works, return -1. Use <code>findFreeBlock</code> and <code>reserveSlots(room, startSlot, numSlots)</code>.",
+    ex: "Room 1: X F F X F X F F X F X F · Room 2: X F F X F F F X X F F F · Room 3: all free · bookRoom(1, 3, 2) → 1 · bookRoom(1, 3, 3) → 2 · bookRoom(1, 2, 4) → -1",
+    start: "Read the rules and the three rooms together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "For each room from firstRoom to lastRoom:", say: "Check the rooms in order, so we book the first room that works." },
+      { t: "    start = findFreeBlock(room, numSlots)", say: "Use part (a). You get credit for calling it correctly even if your part (a) was not finished." },
+      { t: "    If start is not -1:", say: "-1 means this room has no block. Anything else is the first slot of a block." },
+      { t: "        Reserve numSlots slots in this room, starting at start.", say: "Actually book the slots. Finding them is not enough." },
+      { t: "        Return room.", say: "Return the ROOM number, not the slot." },
+      { t: "After the loop, return -1.", say: "No room in the range had a block." }
+    ],
+    code: [
+      { t: "public int bookRoom(int firstRoom, int lastRoom, int numSlots)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    for (int room = firstRoom; room <= lastRoom; room++)", s: 1 },
+      { t: "    {", s: 1 },
+      { t: "        int start = findFreeBlock(room, numSlots);", s: 2 },
+      { t: "        if (start != -1)", s: 3 },
+      { t: "        {", s: 3 },
+      { t: "            reserveSlots(room, start, numSlots);", s: 4 },
+      { t: "            return room;", s: 5 },
+      { t: "        }", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    return -1;", s: 6 },
+      { t: "}", s: 6 }
+    ],
+    steps: [
+      { maps: [0], say: "room goes from firstRoom up to AND including lastRoom, so use <=." },
+      { maps: [1], say: "Save the answer from part (a) in a variable so you can use it twice. bookRoom(1, 3, 3): room 1 → -1 (its longest run is 2)." },
+      { maps: [2], say: "Room 1 gave -1, so skip it. Room 2 gives 4, so go inside." },
+      { maps: [3], say: "reserveSlots(2, 4, 3) books slots 4, 5 and 6 in room 2. The order of the arguments matters: room, start slot, how many." },
+      { maps: [4], say: "Return 2, the room. The return is inside the if, so we stop at the first room that works." },
+      { maps: [5], say: "return -1 goes AFTER the loop. Inside the loop it would give up after room 1. bookRoom(1, 2, 4) → -1." }
+    ]
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+let part = "1a";
+let step = 0;
+let showAll = false;
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function highlight(src) {
+  return esc(src).replace(/("[^"]*")|\b(public|int|double|for|while|if|else|return|String)\b|\b(\d+)\b/g, (m, str, kw, num) => {
+    if (str) return '<span class="str">' + str + "</span>";
+    if (kw) return '<span class="kw">' + kw + "</span>";
+    return '<span class="num">' + num + "</span>";
+  });
+}
+function total(p) { return 1 + p.pseudo.length + p.steps.length; }
+
+function renderStatic() {
+  const p = PARTS[part];
+  $("task").innerHTML = '<span class="sig">' + esc(p.sig) + '</span><span>' + p.task + '</span><span class="ex">' + esc(p.ex) + "</span>";
+  $("pseudo").innerHTML = p.pseudo.map((l, i) =>
+    '<div class="ln" data-i="' + i + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + esc(l.t) + "</span></div>").join("");
+  $("code").innerHTML = p.code.map((l, i) =>
+    '<div class="ln" data-s="' + l.s + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + highlight(l.t) + "</span></div>").join("");
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.part === part)));
+}
+
+function render() {
+  const p = PARTS[part];
+  const nP = p.pseudo.length, nC = p.steps.length, last = total(p) - 1;
+  if (showAll) step = last;
+  const pseudoShown = Math.min(step, nP);
+  const codeStep = Math.max(0, step - nP);
+
+  document.querySelectorAll("#pseudo .ln").forEach((el) => {
+    const i = Number(el.dataset.i);
+    el.classList.toggle("pending", i >= pseudoShown);
+    el.classList.toggle("now", !showAll && codeStep === 0 && i === pseudoShown - 1);
+    const linked = !showAll && codeStep > 0 && p.steps[codeStep - 1].maps.includes(i);
+    el.classList.toggle("linked", linked);
+  });
+  document.querySelectorAll("#code .ln").forEach((el) => {
+    const s = Number(el.dataset.s);
+    el.classList.toggle("pending", s > codeStep);
+    el.classList.toggle("now", !showAll && s === codeStep);
+    el.classList.remove("linked");
+  });
+
+  let where, say;
+  if (showAll) { where = "Full solution"; say = "Everything is showing. Press Restart to step through again."; }
+  else if (step === 0) { where = "The task"; say = p.start; }
+  else if (codeStep === 0) { where = "Pseudocode · line " + step + " of " + nP; say = p.pseudo[step - 1].say; }
+  else { where = "Java · step " + codeStep + " of " + nC; say = p.steps[codeStep - 1].say; }
+  $("where").textContent = where;
+  $("say").textContent = say;
+  $("pseudo-count").textContent = pseudoShown + " / " + nP;
+  $("code-count").textContent = codeStep + " / " + nC;
+  $("counter").textContent = "Step " + step + " of " + last;
+  $("back").disabled = step === 0;
+  $("next").disabled = step === last;
+  $("all").textContent = showAll ? "Step mode" : "Show all";
+
+  const now = document.querySelector(".ln.now");
+  if (now && now.scrollIntoView) now.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function go(d) {
+  const last = total(PARTS[part]) - 1;
+  showAll = false;
+  step = Math.max(0, Math.min(last, step + d));
+  render();
+}
+function setPart(p, fromHash) {
+  if (!PARTS[p]) p = "1a";
+  part = p; step = 0; showAll = false;
+  if (!fromHash) { try { history.replaceState(null, "", "#part-" + p); } catch (e) { location.hash = "part-" + p; } }
+  renderStatic(); render();
+}
+
+$("next").addEventListener("click", () => go(1));
+$("back").addEventListener("click", () => go(-1));
+$("restart").addEventListener("click", () => { showAll = false; step = 0; render(); });
+$("all").addEventListener("click", () => { if (showAll) { showAll = false; step = 0; } else { showAll = true; } render(); });
+$("full").addEventListener("click", () => {
+  const el = document.documentElement;
+  try {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  } catch (e) {}
+});
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setPart(t.dataset.part)));
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) {
+    if (e.key === "Enter" && e.target.tagName === "BUTTON") return;
+    e.preventDefault(); go(1);
+  } else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(-1); }
+  else if (e.key === "Home") { e.preventDefault(); showAll = false; step = 0; render(); }
+});
+function fromHash() { const m = location.hash.match(/^#part-(1a|1b|2a|2b)$/); setPart(m ? m[1] : "1a", true); }
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
+</body>
+</html>
