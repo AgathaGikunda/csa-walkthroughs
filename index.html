@@ -6,92 +6,209 @@
 <title>AP CSA FRQ Walkthroughs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap">
 <style>
 :root {
-  --bg: #eef1f6; --surface: #ffffff; --ink: #1b2232; --muted: #5a6478; --rule: #d7dde8; --accent: #2c56c9;
-  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
-  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+  --bg: #FFF6E5; --surface: #FFFDF8; --ink: #2A2547; --muted: #5C5878; --rule: #F0E2C4;
+  --yellow: #F5B82E;
+  --test: #F2694B;    --test-ink: #B23A1C;    --test-pale: #FFE3D9;
+  --class: #1FA595;   --class-ink: #0F6E62;   --class-pale: #D5F0EB;
+  --concept: #9B82F0; --concept-ink: #5B3FC4; --concept-pale: #EAE3FF;
+  --shadow: 0 6px 18px rgba(42, 37, 71, 0.08);
+  --font-head: "Fredoka", "Trebuchet MS", Verdana, sans-serif;
+  --font-text: "Nunito", "Segoe UI", Verdana, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245; --accent: #8eaeff; color-scheme: dark; }
+  :root {
+    --bg: #1C1830; --surface: #28233F; --ink: #F4F0FF; --muted: #B9B3D3; --rule: #3A3456;
+    --test-ink: #FF9F85;    --test-pale: #4A2A2A;
+    --class-ink: #74DCC9;   --class-pale: #1C3E3B;
+    --concept-ink: #C8B8FF; --concept-pale: #352D5C;
+    --shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    color-scheme: dark;
+  }
 }
 * { box-sizing: border-box; }
+html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 18px; line-height: 1.5;
-  padding: 32px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+  margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--font-text); font-size: 18px; line-height: 1.5;
+  background:
+    radial-gradient(circle at 8% 6%, color-mix(in srgb, var(--yellow) 28%, transparent) 0 120px, transparent 121px),
+    radial-gradient(circle at 96% 18%, color-mix(in srgb, var(--class) 20%, transparent) 0 90px, transparent 91px),
+    radial-gradient(circle at 90% 92%, color-mix(in srgb, var(--concept) 20%, transparent) 0 140px, transparent 141px),
+    radial-gradient(circle at 4% 80%, color-mix(in srgb, var(--test) 16%, transparent) 0 70px, transparent 71px),
+    var(--bg);
+  padding: 36px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
 }
-main { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-h1 { margin: 0; font-size: 1.8em; text-wrap: balance; }
-.lead { margin: 0; color: var(--muted); }
-.group { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; border-top: 2px solid var(--rule); }
-h2 { margin: 0; font-size: 1.3em; }
-.list { display: flex; flex-direction: column; gap: 12px; }
+main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+
+.hero { display: flex; flex-direction: column; gap: 10px; }
+.hero h1 { margin: 0; font-family: var(--font-head); font-weight: 600; font-size: clamp(2em, 5vw, 2.7em); line-height: 1.1; text-wrap: balance; }
+.hero h1 .hi { color: var(--test-ink); }
+.cheer {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 2px solid var(--rule); border-radius: 999px; padding: 8px 18px;
+  font-weight: 800; box-shadow: var(--shadow);
+}
+.cheer .e { font-size: 1.3em; line-height: 1; }
+
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tab {
+  font: inherit; color: var(--ink); text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px; padding: 16px 18px;
+  background: var(--surface); border: 3px solid transparent; border-radius: 22px; box-shadow: var(--shadow);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.tab .icon {
+  width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 28px;
+  background: var(--pale); margin-bottom: 4px;
+}
+.tab .t { font-family: var(--font-head); font-weight: 600; font-size: 1.3em; line-height: 1.15; color: var(--c-ink); }
+.tab .n { font-size: 0.85em; color: var(--muted); font-weight: 700; }
+.tab:hover { transform: translateY(-3px); }
+.tab[aria-selected="true"] { background: var(--pale); border-color: var(--c); }
+.tab[aria-selected="true"] .icon { background: var(--surface); }
+.tab:focus-visible { outline: 3px solid var(--c-ink); outline-offset: 3px; }
+.g-test    { --c: var(--test);    --c-ink: var(--test-ink);    --pale: var(--test-pale); }
+.g-class   { --c: var(--class);   --c-ink: var(--class-ink);   --pale: var(--class-pale); }
+.g-concept { --c: var(--concept); --c-ink: var(--concept-ink); --pale: var(--concept-pale); }
+
+.panel { display: flex; flex-direction: column; gap: 14px; background: var(--pale); border-radius: 28px; padding: 22px; }
+.panel[hidden] { display: none; }
+.panel .lead { margin: 0; font-weight: 700; color: var(--ink); }
+.list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 a.card {
-  display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border-radius: 12px;
-  background: var(--surface); border: 2px solid var(--rule); color: var(--ink); text-decoration: none;
+  display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 18px;
+  background: var(--surface); color: var(--ink); text-decoration: none; box-shadow: var(--shadow);
+  border: 3px solid transparent; transition: transform 0.15s ease, border-color 0.15s ease;
 }
-a.card:hover, a.card:focus-visible { border-color: var(--accent); outline: none; }
-.name { font-weight: 700; font-size: 1.15em; color: var(--accent); }
-.parts { font-family: var(--font-code); font-size: 0.85em; color: var(--muted); }
-.how { margin: 0; color: var(--muted); font-size: 0.9em; }
-kbd { font-family: var(--font-code); font-size: 0.85em; border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; background: var(--surface); }
+a.card:hover, a.card:focus-visible { transform: translateY(-3px); border-color: var(--c); outline: none; }
+.badge {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--font-head); font-weight: 600; font-size: 1.15em; background: var(--c); color: #2A2547;
+}
+.card .body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.name { font-family: var(--font-head); font-weight: 600; font-size: 1.2em; line-height: 1.2; color: var(--c-ink); }
+.parts { font-size: 0.88em; color: var(--muted); }
+.new { align-self: flex-start; font-size: 0.72em; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; background: var(--yellow); color: #2A2547; padding: 1px 10px; border-radius: 999px; }
+
+.foot { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; color: var(--muted); font-size: 0.92em; }
+kbd { font-family: var(--font-text); font-weight: 800; font-size: 0.85em; border: 2px solid var(--rule); border-bottom-width: 3px; border-radius: 6px; padding: 0 6px; background: var(--surface); color: var(--ink); }
+
+@media (max-width: 600px) {
+  body { font-size: 17px; padding-top: 24px; }
+  .tabs { gap: 8px; }
+  .tab { padding: 12px 10px; border-radius: 18px; }
+  .tab .icon { width: 40px; height: 40px; font-size: 22px; border-radius: 12px; }
+  .tab .t { font-size: 1em; }
+  .tab .n { font-size: 0.75em; }
+  .panel { padding: 14px; border-radius: 22px; }
+  .list { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .tab, a.card { transition: none; } .tab:hover, a.card:hover { transform: none; } }
 </style>
 </head>
 <body>
 <main>
-  <h1>AP CSA FRQ Walkthroughs</h1>
-  <section class="group" aria-labelledby="warmup">
-  <h2 id="warmup">Warm-up: String Methods</h2>
-  <p class="lead">Do this before the FRQ 1 walkthroughs. Read a scenario, pick the String method, and see how to use it.</p>
-  <div class="list">
-    <a class="card" href="string-methods.html">
-      <span class="name">String Methods: Which One, and How?</span>
-      <span class="parts">length · substring · indexOf · equals · compareTo · split</span>
-    </a>
+  <header class="hero">
+    <h1>AP CSA <span class="hi">Walkthroughs</span></h1>
+    <p class="cheer"><span class="e" id="cheer-e" aria-hidden="true">🌱</span><span id="cheer">One step at a time. You’ve got this!</span></p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Walkthrough type">
+    <button class="tab g-test" role="tab" id="t-tests" data-p="tests" aria-controls="tests" aria-selected="true">
+      <span class="icon" aria-hidden="true">📝</span><span class="t">Tests</span><span class="n">3 walkthroughs</span>
+    </button>
+    <button class="tab g-class" role="tab" id="t-class" data-p="class" aria-controls="class" aria-selected="false">
+      <span class="icon" aria-hidden="true">💪</span><span class="t">In-Class Practice</span><span class="n">4 walkthroughs</span>
+    </button>
+    <button class="tab g-concept" role="tab" id="t-concept" data-p="concept" aria-controls="concept" aria-selected="false">
+      <span class="icon" aria-hidden="true">💡</span><span class="t">Concept Review</span><span class="n">1 walkthrough</span>
+    </button>
   </div>
+
+  <section class="panel g-test" id="tests" role="tabpanel" aria-labelledby="t-tests">
+    <p class="lead">Go over a test after it is graded. Compare each step with what you wrote. Mistakes are how you learn!</p>
+    <div class="list">
+      <a class="card" href="nov13-unit2-test-part1.html">
+        <span class="badge" aria-hidden="true">1</span>
+        <span class="body"><span class="new">New</span><span class="name">Nov 13th Unit 2 Test Part 1</span><span class="parts">1a lapWinner · 1b fastestLap · 2a findFreeBlock · 2b bookRoom</span></span>
+      </a>
+      <a class="card" href="scoreboard-stepper.html">
+        <span class="badge" aria-hidden="true">2</span>
+        <span class="body"><span class="name">Scoreboard</span><span class="parts">(a) bestRound · (b) initials</span></span>
+      </a>
+      <a class="card" href="playlist-stepper.html">
+        <span class="badge" aria-hidden="true">3</span>
+        <span class="body"><span class="name">Playlist</span><span class="parts">(a) songsThatFit · (b) hashtag</span></span>
+      </a>
+    </div>
   </section>
-  <section class="group" aria-labelledby="frq1">
-  <h2 id="frq1">FRQ 1 Sample Walkthrough</h2>
-  <p class="lead">Each walkthrough shows the pseudocode one line at a time, then the Java solution one line at a time.</p>
-  <div class="list">
-    <a class="card" href="scoreboard-stepper.html">
-      <span class="name">Scoreboard</span>
-      <span class="parts">(a) bestRound · (b) initials</span>
-    </a>
-    <a class="card" href="playlist-stepper.html">
-      <span class="name">Playlist</span>
-      <span class="parts">(a) songsThatFit · (b) hashtag</span>
-    </a>
-    <a class="card" href="textcolumn-stepper.html">
-      <span class="name">Text Processing (Unit 2 Progress Check)</span>
-      <span class="parts">1a text column · 1b longest prefix</span>
-    </a>
-    <a class="card" href="downloads-stepper.html">
-      <span class="name">Song Downloads (Unit 2 Progress Check)</span>
-      <span class="parts">2a ones digit · 2b title by artist</span>
-    </a>
-    <a class="card" href="nametags-stepper.html">
-      <span class="name">Name Tags (Unit 2 practice)</span>
-      <span class="parts">1a name tag · 1b longest suffix</span>
-    </a>
-    <a class="card" href="library-stepper.html">
-      <span class="name">Library Books (Unit 2 practice)</span>
-      <span class="parts">2a largest ones digit · 2b title and year</span>
-    </a>
+
+  <section class="panel g-class" id="class" role="tabpanel" aria-labelledby="t-class" hidden>
+    <p class="lead">Practice FRQs from class. Try them yourself first, then step through.</p>
+    <div class="list">
+      <a class="card" href="textcolumn-stepper.html">
+        <span class="badge" aria-hidden="true">1</span>
+        <span class="body"><span class="name">Text Processing</span><span class="parts">1a text column · 1b longest prefix</span></span>
+      </a>
+      <a class="card" href="downloads-stepper.html">
+        <span class="badge" aria-hidden="true">2</span>
+        <span class="body"><span class="name">Song Downloads</span><span class="parts">2a ones digit · 2b title by artist</span></span>
+      </a>
+      <a class="card" href="nametags-stepper.html">
+        <span class="badge" aria-hidden="true">3</span>
+        <span class="body"><span class="name">Name Tags</span><span class="parts">1a name tag · 1b longest suffix</span></span>
+      </a>
+      <a class="card" href="library-stepper.html">
+        <span class="badge" aria-hidden="true">4</span>
+        <span class="body"><span class="name">Library Books</span><span class="parts">2a largest ones digit · 2b title and year</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="panel g-concept" id="concept" role="tabpanel" aria-labelledby="t-concept" hidden>
+    <p class="lead">Build the skills the FRQs use. Start here if a method feels shaky.</p>
+    <div class="list">
+      <a class="card" href="string-methods.html">
+        <span class="badge" aria-hidden="true">1</span>
+        <span class="body"><span class="new">New</span><span class="name">String Methods: Which One, and How?</span><span class="parts">length · substring · indexOf · equals · compareTo · split</span></span>
+      </a>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>In a walkthrough: <kbd>→</kbd> or <kbd>Space</kbd> next line, <kbd>←</kbd> back.</span>
+    <span>Take a breath. Small steps add up. ☕</span>
   </div>
-  </section>
-  <section class="group" aria-labelledby="tests">
-  <h2 id="tests">Test Walkthroughs</h2>
-  <div class="list">
-    <a class="card" href="nov13-unit2-test-part1.html">
-      <span class="name">Nov 13th Unit 2 Test Part 1</span>
-      <span class="parts">1a lapWinner · 1b fastestLap · 2a findFreeBlock · 2b bookRoom</span>
-    </a>
-  </div>
-  </section>
-  <p class="how">Use <kbd>→</kbd> or <kbd>Space</kbd> for the next line and <kbd>←</kbd> to go back.</p>
 </main>
+<script>
+const CHEERS = [
+  ['🌱', 'One step at a time. You’ve got this!'],
+  ['🌟', 'Every bug you fix makes you a better coder.'],
+  ['🚀', 'Pseudocode first. Then the code feels easier.'],
+  ['🧩', 'Stuck? Trace it with the example. That’s what pros do.'],
+  ['🌈', 'You know more than you did last week. Keep going!'],
+  ['🎯', 'Progress, not perfection.']
+];
+const pick = CHEERS[Math.floor(Math.random() * CHEERS.length)];
+document.getElementById('cheer-e').textContent = pick[0];
+document.getElementById('cheer').textContent = pick[1];
+
+const tabs = document.querySelectorAll('.tab');
+function show(p, save) {
+  if (!document.getElementById(p) || !document.querySelector('.tab[data-p="' + p + '"]')) p = 'tests';
+  tabs.forEach((t) => {
+    const on = t.dataset.p === p;
+    t.setAttribute('aria-selected', String(on));
+    document.getElementById(t.dataset.p).hidden = !on;
+  });
+  if (save) { try { history.replaceState(null, '', '#' + p); } catch (e) {} }
+}
+tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.p, true)));
+show(location.hash.slice(1) || 'tests', false);
+window.addEventListener('hashchange', () => show(location.hash.slice(1), false));
+</script>
 </body>
 </html>
