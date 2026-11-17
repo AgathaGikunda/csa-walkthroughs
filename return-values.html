@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>void or Not? What Comes Back from a Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #eef1f6; --surface: #ffffff; --ink: #1b2232; --muted: #5a6478; --rule: #d7dde8; --accent: #2c56c9;
+  --code-bg: #f4f6fb; --method: #8a3fb8; --str: #1d7a52; --num: #b5531c; --comment: #6b7487;
+  --good: #1d7a52; --good-bg: #e3f4ec; --bad: #b53a2a; --bad-bg: #fbe9e6; --tip-bg: #fff4d6; --tip-rule: #e2b43c;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245; --accent: #8eaeff;
+    --code-bg: #121826; --method: #d29bf5; --str: #7fd6a8; --num: #f3a66f; --comment: #8590a6;
+    --good: #7fd6a8; --good-bg: #16302a; --bad: #f29b8c; --bad-bg: #3a1f1c; --tip-bg: #33290f; --tip-rule: #b8902a;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 18px; line-height: 1.5;
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+a.home { color: var(--accent); font-weight: 700; text-decoration: none; }
+h1 { margin: 0; font-size: 1.8em; line-height: 1.2; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); }
+.tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--rule); }
+.tab {
+  font: inherit; font-weight: 700; padding: 10px 18px; border: 2px solid transparent; border-bottom: none;
+  border-radius: 10px 10px 0 0; background: none; color: var(--muted); cursor: pointer; margin-bottom: -2px;
+}
+.tab[aria-selected="true"] { background: var(--surface); color: var(--accent); border-color: var(--rule); border-bottom: 2px solid var(--surface); }
+.panel[hidden] { display: none; }
+.card { background: var(--surface); border: 2px solid var(--rule); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+code, .code { font-family: var(--font-code); font-size: 0.9em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+h2 { margin: 0; font-size: 1.3em; }
+h3 { margin: 0; font-size: 1.05em; }
+p { margin: 0; }
+
+/* Meet the methods */
+.facts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.fact { background: var(--code-bg); border-radius: 10px; padding: 12px 14px; }
+.fact b { color: var(--accent); }
+.mlist { display: flex; flex-direction: column; gap: 12px; }
+.method { display: flex; flex-direction: column; gap: 8px; }
+.sig { font-family: var(--font-code); font-weight: 700; color: var(--method); font-size: 1.05em; overflow-wrap: anywhere; }
+.ex { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-family: var(--font-code); font-size: 0.9em; background: var(--code-bg); border-radius: 8px; padding: 8px 12px; }
+.ex .arrow { color: var(--muted); }
+.ex .out { font-weight: 700; color: var(--str); }
+.letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell { display: flex; flex-direction: column; align-items: center; min-width: 40px; border: 2px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.cell .ch { font-family: var(--font-code); font-weight: 700; font-size: 1.15em; padding: 4px 8px; }
+.cell .ix { font-family: var(--font-code); font-size: 0.75em; color: var(--muted); background: var(--code-bg); width: 100%; text-align: center; }
+.cell.on { border-color: var(--accent); }
+.cell.on .ch { background: var(--accent); color: var(--surface); }
+.go { align-self: flex-start; font: inherit; font-weight: 700; padding: 10px 20px; border-radius: 10px; border: none; background: var(--accent); color: var(--surface); cursor: pointer; }
+
+/* Practice */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.count { font-weight: 700; color: var(--muted); }
+.score { font-weight: 700; color: var(--good); }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: var(--rule); border: none; padding: 0; cursor: pointer; }
+.dot.here { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dot.right { background: var(--good); }
+.dot.tried { background: var(--tip-rule); }
+.story { font-size: 1.08em; }
+.header { font-family: var(--font-code); font-size: 0.9em; background: var(--code-bg); border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 6px; overflow-x: auto; white-space: pre; }
+.sample { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.sample span { background: var(--code-bg); border-radius: 8px; padding: 6px 12px; font-family: var(--font-code); font-size: 0.9em; }
+.ask { font-weight: 700; }
+.opts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.opt {
+  font: inherit; font-family: var(--font-code); font-size: 0.95em; font-weight: 700; text-align: left;
+  display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 10px;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer;
+}
+.opt:hover:not(:disabled), .opt:focus-visible { border-color: var(--accent); outline: none; }
+.opt .k { font-family: var(--font-text); font-size: 0.8em; color: var(--muted); border: 1px solid var(--rule); border-radius: 5px; padding: 0 6px; }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.right { border-color: var(--good); background: var(--good-bg); }
+.opt:disabled { cursor: default; }
+.opt span:last-child { white-space: pre-line; }
+.feedback { border-radius: 10px; padding: 12px 14px; }
+.feedback.bad { background: var(--bad-bg); border-left: 5px solid var(--bad); }
+.feedback.good { background: var(--good-bg); border-left: 5px solid var(--good); }
+.feedback .fbh { display: block; margin-bottom: 2px; font-weight: 700; }
+.reveal { display: flex; flex-direction: column; gap: 14px; }
+.reveal[hidden] { display: none; }
+.step-h { font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.85em; }
+.java { background: var(--code-bg); border-radius: 10px; padding: 12px 0; overflow-x: auto; }
+.line { display: grid; grid-template-columns: minmax(0, max-content) 1fr; gap: 0 18px; padding: 3px 16px; align-items: baseline; }
+.line .src { font-family: var(--font-code); font-size: 0.9em; white-space: pre; }
+.line .cm { font-size: 0.85em; color: var(--comment); }
+.line.hot { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.tok-m { color: var(--method); font-weight: 700; }
+.tok-s { color: var(--str); }
+.tok-n { color: var(--num); }
+.tok-k { color: var(--accent); font-weight: 700; }
+.trace { display: flex; flex-direction: column; gap: 6px; }
+.trace div { font-family: var(--font-code); font-size: 0.88em; background: var(--code-bg); border-radius: 8px; padding: 6px 12px; overflow-wrap: anywhere; }
+.tip { background: var(--tip-bg); border-left: 5px solid var(--tip-rule); border-radius: 10px; padding: 12px 14px; }
+.nav { display: flex; justify-content: space-between; gap: 10px; }
+.nav button { font: inherit; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+.nav button.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.nav button:disabled { opacity: 0.45; cursor: default; }
+.done { text-align: center; align-items: center; }
+.how { margin: 0; color: var(--muted); font-size: 0.9em; }
+kbd { font-family: var(--font-code); font-size: 0.85em; border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; background: var(--surface); }
+@media (max-width: 560px) {
+  .line { grid-template-columns: 1fr; }
+  .line .cm { padding-left: 2ch; }
+}
+
+/* void vs return */
+.tok-v { color: var(--bad); font-weight: 700; }
+.anatomy { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+.seg { display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 10px; padding: 8px 12px; background: var(--code-bg); border: 2px solid var(--rule); }
+.seg .c { font-family: var(--font-code); font-weight: 700; font-size: 1.1em; }
+.seg .l { font-size: 0.78em; color: var(--muted); font-weight: 700; text-align: center; }
+.seg.dim { opacity: 0.6; }
+.seg.ret { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.seg.ret .c, .seg.ret .l { color: var(--accent); }
+.seg.ret.void { border-color: var(--bad); background: var(--bad-bg); }
+.seg.ret.void .c, .seg.ret.void .l { color: var(--bad); }
+.seg.nm .c { color: var(--method); }
+.rules { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.rule { background: var(--code-bg); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.rule .ex { background: var(--surface); }
+.ex .mark { font-family: var(--font-text); font-weight: 700; font-size: 1.1em; }
+.ex.good .mark { color: var(--good); }
+.ex.badx { background: var(--bad-bg); }
+.ex.badx .mark { color: var(--bad); }
+.ex .why { font-family: var(--font-text); color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <a class="home" href="index.html">← All walkthroughs</a>
+  <h1>void or Not? What Comes Back from a Method</h1>
+  <p class="lead">Every FRQ gives you helper methods to call. First learn to read a method header, then practice: decide what comes back, and how to call it the right way.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-meet" aria-controls="meet" aria-selected="true">1. Meet the idea</button>
+    <button class="tab" role="tab" id="tab-practice" aria-controls="practice" aria-selected="false">2. Practice</button>
+  </div>
+
+  <section class="panel" id="meet" role="tabpanel" aria-labelledby="tab-meet">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <h2>Three facts first</h2>
+        <div class="facts">
+          <div class="fact"><b>void means nothing comes back.</b> The method does a job, like printing or changing a score, and that's it.</div>
+          <div class="fact"><b>Any other word means a value comes back.</b> <code>int</code>, <code>double</code>, <code>boolean</code> or <code>String</code> tells you its type.</div>
+          <div class="fact"><b>Catch what comes back.</b> Save it in a variable of the <b>same type</b>, or it is lost.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>How to read a method header</h2>
+        <p>Look at the word <b>right before the method's name</b>. That word tells you what comes back.</p>
+        <div class="anatomy" aria-label="public int scoreInRound(int round): int is what comes back, scoreInRound is the name, int round is what goes in">
+          <div class="seg dim"><span class="c">public</span><span class="l">skip for now</span></div>
+          <div class="seg ret"><span class="c">int</span><span class="l">what comes back</span></div>
+          <div class="seg nm"><span class="c">scoreInRound</span><span class="l">the name</span></div>
+          <div class="seg in"><span class="c">(int round)</span><span class="l">what goes in</span></div>
+        </div>
+        <div class="anatomy" aria-label="public void printReport(): void means nothing comes back">
+          <div class="seg dim"><span class="c">public</span><span class="l">skip for now</span></div>
+          <div class="seg ret void"><span class="c">void</span><span class="l">NOTHING comes back</span></div>
+          <div class="seg nm"><span class="c">printReport</span><span class="l">the name</span></div>
+          <div class="seg in"><span class="c">()</span><span class="l">nothing goes in</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>So how do I call it?</h2>
+        <div class="rules">
+          <div class="rule">
+            <h3>The word is <code>void</code></h3>
+            <p>Call it on its own line. There is nothing to save.</p>
+            <div class="ex"><span>printReport();</span></div>
+          </div>
+          <div class="rule">
+            <h3>The word is a type, like <code>int</code></h3>
+            <p>Save it in a variable of that same type.</p>
+            <div class="ex"><span><span class="tok-k">int</span> score = scoreInRound(<span class="tok-n">2</span>);</span></div>
+          </div>
+        </div>
+        <div class="tip"><b>Think of a vending machine.</b> A non-void method hands you something. If you don't hold out your hand (a variable), it falls on the floor and is gone.</div>
+      </div>
+
+      <div class="mlist" id="mlist"></div>
+      <button class="go" id="start">Start practicing →</button>
+    </div>
+  </section>
+
+  <section class="panel" id="practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="bar">
+        <span class="count" id="count"></span>
+        <span class="score" id="score"></span>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="card" id="qcard"></div>
+      <div class="nav">
+        <button id="prev">← Back</button>
+        <button id="next" class="primary">Next scenario →</button>
+      </div>
+      <p class="how">Pick with the mouse or press <kbd>1</kbd>–<kbd>4</kbd>. Use <kbd>→</kbd> for the next scenario and <kbd>←</kbd> to go back.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const METHODS = [
+  { sig: 'public void printReport()', gives: 'nothing (void)', plain: 'Prints a report on the screen. It does a job and gives nothing back.',
+    good: 'printReport();', out: 'the report is printed', bad: 'String r = printReport();', badWhy: 'Error: nothing comes back, so there is nothing to save.' },
+  { sig: 'public void addPoints(int pts)', gives: 'nothing (void)', plain: 'Adds pts to the team’s score. The score changes, but nothing comes back to you.',
+    good: 'addPoints(10);', out: 'the score goes up by 10', bad: 'int total = addPoints(10);', badWhy: 'Error: a void method has no value to put in total.' },
+  { sig: 'public int scoreInRound(int round)', gives: 'an int', plain: 'Looks up the score for one round and hands the number back.',
+    good: 'int score = scoreInRound(2);', out: 'score is 30', bad: 'scoreInRound(2);', badWhy: 'No error, but the 30 is thrown away. You can’t use it later.' },
+  { sig: 'public boolean isTaken(String name)', gives: 'true or false', plain: 'Checks if a username is already used. Hands back true or false.',
+    good: 'boolean taken = isTaken("jlee");', out: 'taken is true', bad: 'String taken = isTaken("jlee");', badWhy: 'Error: true/false is a boolean, not a String.' },
+  { sig: 'public String getTeamName()', gives: 'a String', plain: 'Hands back the team’s name as text.',
+    good: 'String team = getTeamName();', out: 'team is "Panthers"', bad: 'int team = getTeamName();', badWhy: 'Error: "Panthers" is text. It can’t go in an int.' },
+  { sig: 'public double getAverage()', gives: 'a double', plain: 'Works out the average score. A double can have a decimal point.',
+    good: 'double avg = getAverage();', out: 'avg is 17.5', bad: 'int avg = getAverage();', badWhy: 'Error: 17.5 has a decimal. An int can’t hold it.' }
+];
+
+// Each scenario: story, header, sample (2), ask, options (4), why, code [src, comment], trace, tip
+const S = [
+  { story: 'You are given this helper method. Look at the word before the name.',
+    header: 'public void printReport()',
+    sample: ['prints the team report', 'what does it give back?'],
+    ask: 'What does printReport give back when you call it?',
+    options: [
+      { t: 'an int', why: 'There is no int before the name. The word before the name is void.' },
+      { t: 'nothing', ok: true },
+      { t: 'a String', why: 'It prints text on the screen, but printing is not giving back. void means nothing comes back.' },
+      { t: 'true or false', why: 'That would need boolean before the name. Here it is void.' }
+    ],
+    why: '<code>void</code> means <b>nothing comes back</b>. Printing shows something on the screen, but it does not hand a value back to your code.',
+    code: [['printReport();', 'call it on its own line. Nothing to save.']],
+    trace: ['printReport() runs and the report appears on the screen', 'no value comes back to the code'],
+    tip: 'Printing is NOT the same as returning. A method can print and still be void.'
+  },
+  { story: 'The team scored. You need to add <b>10 points</b> using this helper.',
+    header: 'public void addPoints(int pts)',
+    sample: ['score before: 40', 'score after: 50'],
+    ask: 'Which line adds 10 points?',
+    options: [
+      { t: 'int total = addPoints(10);', why: 'addPoints is void. Nothing comes back, so there is nothing to put in total.' },
+      { t: 'addPoints(10);', ok: true },
+      { t: 'addPoints = 10;', why: 'You call a method with ( ). You can’t give a method a value with =.' },
+      { t: 'boolean ok = addPoints(10);', why: 'void gives back nothing, not true or false.' }
+    ],
+    why: 'A <code>void</code> method is called <b>on its own line</b>. It does its job (adds the points). There is nothing to catch.',
+    code: [['addPoints(10);', 'the score changes inside the object']],
+    trace: ['addPoints(10) runs', 'the score goes from 40 to 50', 'nothing comes back, and nothing is saved'],
+    tip: 'void method? Call it alone: <code>name(...);</code> Never put it on the right side of <code>=</code>.'
+  },
+  { story: 'You need the score from <b>round 3</b> so you can use it later.',
+    header: 'public int scoreInRound(int round)',
+    sample: ['round 3 scored 30', 'save the 30'],
+    ask: 'Which line gets the score of round 3 and keeps it?',
+    options: [
+      { t: 'scoreInRound(3);', why: 'This calls the method, but the 30 comes back and is thrown away. Nothing is holding it.' },
+      { t: 'String score = scoreInRound(3);', why: 'The word before the name is int. 30 is a number, so the variable must be an int.' },
+      { t: 'int score = scoreInRound(3);', ok: true },
+      { t: 'int score = scoreInRound;', why: 'You must have ( ) and the round number to call a method.' }
+    ],
+    why: 'The header says <code>int</code>, so a number comes back. <b>Catch it in an int variable.</b>',
+    code: [['int score = scoreInRound(3);', 'the int that comes back goes into score']],
+    trace: ['scoreInRound(3) → 30', 'int score = 30'],
+    tip: 'Copy the type from the header: the header says <code>int</code>, so you write <code>int score = ...</code>'
+  },
+  { story: 'You need to know if the username <code>"jlee"</code> is already used.',
+    header: 'public boolean isTaken(String name)',
+    sample: ['"jlee" is already used', 'isTaken gives back true'],
+    ask: 'What type of variable should hold the answer?',
+    options: [
+      { t: 'int', why: 'An int is a whole number. isTaken gives back true or false.' },
+      { t: 'String', why: 'A String is text. true and false are not text here.' },
+      { t: 'void', why: 'void is never a variable type. It only goes in a header, to say nothing comes back.' },
+      { t: 'boolean', ok: true }
+    ],
+    why: 'The header says <code>boolean</code>, so the answer is <b>true or false</b>. A boolean variable holds it.',
+    code: [['boolean taken = isTaken("jlee");', 'true or false goes into taken'], ['if (taken == true)', 'now we can use the saved answer']],
+    trace: ['isTaken("jlee") → true', 'boolean taken = true', 'taken == true → the if runs'],
+    tip: 'You can never write <code>void x = ...</code>. void only means “nothing comes back.”'
+  },
+  { story: 'You need the class average. It might be something like <b>17.5</b>.',
+    header: 'public double getAverage()',
+    sample: ['the average is 17.5', 'save it'],
+    ask: 'Which line saves the average correctly?',
+    options: [
+      { t: 'int avg = getAverage();', why: 'An int can’t hold 17.5. Java gives an error because the decimal would be lost.' },
+      { t: 'double avg = getAverage();', ok: true },
+      { t: 'getAverage();', why: 'The 17.5 comes back and is thrown away.' },
+      { t: 'double avg = getAverage;', why: 'Methods are called with ( ), even when nothing goes in.' }
+    ],
+    why: 'The header says <code>double</code>. A double can hold decimals, so <b>save it in a double</b>.',
+    code: [['double avg = getAverage();', 'the empty ( ) still has to be there']],
+    trace: ['getAverage() → 17.5', 'double avg = 17.5'],
+    tip: 'Empty <code>()</code> means nothing goes in. You still need them to call the method.'
+  },
+  { story: 'You need the <b>first letter</b> of the team name. The name comes from a helper.',
+    header: 'public String getTeamName()',
+    sample: ['the name is "Panthers"', 'should get "P"'],
+    ask: 'What should you do first?',
+    options: [
+      { t: 'String team = getTeamName();', ok: true },
+      { t: 'getTeamName();', why: 'The name comes back and is thrown away. Then you have nothing to take the first letter from.' },
+      { t: 'int team = getTeamName();', why: 'The header says String. "Panthers" is text, not a number.' },
+      { t: 'void team = getTeamName();', why: 'void can’t be a variable type.' }
+    ],
+    why: 'Save the String first. <b>Then</b> you can use String methods on the variable.',
+    code: [['String team = getTeamName();', 'step 1: catch the String'], ['String first = team.substring(0, 1);', 'step 2: use it']],
+    trace: ['getTeamName() → "Panthers"', 'String team = "Panthers"', 'team.substring(0, 1) → "P"'],
+    tip: 'Save, then use. Two short lines are easier to read and check than one long one.'
+  },
+  { story: 'You are WRITING a method. It counts the vowels in a word and <b>gives the number back</b>.',
+    header: 'public ??? countVowels(String word)',
+    sample: ['word = "panther"', 'should give back 2'],
+    ask: 'What goes where the ??? is?',
+    options: [
+      { t: 'void', why: 'void means nothing comes back. But this method must give back a number.' },
+      { t: 'String', why: '2 is a number, not text.' },
+      { t: 'int', ok: true },
+      { t: 'boolean', why: 'boolean is only for true or false. We need a count.' }
+    ],
+    why: 'It gives back a <b>whole number</b>, so the return type is <code>int</code>.',
+    code: [['public int countVowels(String word)', 'int = a number comes back']],
+    trace: ['"panther" has a and e', 'countVowels("panther") gives back 2'],
+    tip: 'Ask: “What does it hand back?” A count → int. Yes/no → boolean. Text → String. Nothing → void.'
+  },
+  { story: 'You are WRITING a method that <b>prints</b> “Welcome!” and does nothing else.',
+    header: 'public ??? greet()',
+    sample: ['prints Welcome!', 'gives back nothing'],
+    ask: 'What goes where the ??? is?',
+    options: [
+      { t: 'String', why: 'It prints text, but it doesn’t hand any text back. Printing is not returning.' },
+      { t: 'void', ok: true },
+      { t: 'int', why: 'No number comes back.' },
+      { t: 'boolean', why: 'No true or false comes back.' }
+    ],
+    why: 'It only does a job (printing). <b>Nothing comes back</b>, so it is <code>void</code>.',
+    code: [['public void greet()', 'void: no return statement needed'], ['{', ''], ['    System.out.println("Welcome!");', 'the job it does'], ['}', '']],
+    trace: ['greet() prints Welcome!', 'nothing comes back'],
+    tip: 'A void method doesn’t need a <code>return</code> line at all.'
+  },
+  { story: 'You are WRITING this method. It should <b>give back</b> double the number.',
+    header: 'public int doubleIt(int n)',
+    sample: ['n = 4', 'should give back 8'],
+    ask: 'Which line belongs inside the method?',
+    options: [
+      { t: 'System.out.println(n * 2);', why: 'This prints 8 on the screen but gives nothing back. Java gives an error: an int method must return.' },
+      { t: 'int answer = n * 2;', why: 'This works out 8 and saves it, but never gives it back. You still need return.' },
+      { t: 'return n * 2;', ok: true },
+      { t: 'void n * 2;', why: 'void only goes in a header. It never goes in a statement.' }
+    ],
+    why: 'The header promises an <code>int</code>. The method <b>must end with return</b> and an int.',
+    code: [['return n * 2;', 'hand the answer back to whoever called it']],
+    trace: ['doubleIt(4)', 'n * 2 → 8', 'return 8, so doubleIt(4) gives back 8'],
+    tip: 'Non-void method you write? It must <code>return</code> a value of that type. Print ≠ return.'
+  },
+  { story: 'From the Nov 17 test! In <code>generateUsername</code>, check if <code>name</code> is taken.',
+    header: 'public boolean isTaken(String name)',
+    sample: ['name = "jlee"', 'save the answer to use in the loop'],
+    ask: 'Which line is correct?',
+    options: [
+      { t: 'isTaken(name);', why: 'The true/false comes back and is thrown away. The loop has nothing to check.' },
+      { t: 'String taken = isTaken(name);', why: 'isTaken gives back a boolean, not a String.' },
+      { t: 'boolean taken = isTaken;', why: 'You need ( ) and the name to call the method.' },
+      { t: 'boolean taken = isTaken(name);', ok: true }
+    ],
+    why: 'boolean comes back, so <b>save it in a boolean</b>. Then the loop can check <code>taken</code>.',
+    code: [['boolean taken = isTaken(name);', 'catch the true/false'], ['for (int num = 1; taken == true; num++)', 'the loop uses the saved answer']],
+    trace: ['isTaken("jlee") → true', 'boolean taken = true', 'taken == true, so the loop runs'],
+    tip: 'This is exactly what FRQ 1 asks for: call the helper, save what it gives back, then use the variable.'
+  },
+  { story: 'The class has a void helper and a non-void helper. Add 5 points, then get the new total.',
+    header: 'public void addPoints(int pts)\npublic int getScore()',
+    sample: ['score before: 40', 'total should be 45'],
+    ask: 'Which pair of lines is correct?',
+    options: [
+      { t: 'int t = addPoints(5);\ngetScore();', why: 'Backwards! addPoints is void (nothing to save), and getScore gives an int that is thrown away.' },
+      { t: 'addPoints(5);\nint t = getScore();', ok: true },
+      { t: 'addPoints(5);\ngetScore();', why: 'addPoints is right, but the 45 from getScore is thrown away.' },
+      { t: 'void a = addPoints(5);\nint t = getScore();', why: 'void is never a variable type.' }
+    ],
+    why: 'Check each header. <code>void</code> → call alone. <code>int</code> → save it in an int.',
+    code: [['addPoints(5);', 'void: call it alone'], ['int total = getScore();', 'int: save it']],
+    trace: ['addPoints(5) → score is now 45, nothing comes back', 'getScore() → 45', 'int total = 45'],
+    tip: 'Every time you call a helper, look at its header first. That one word decides how you call it.'
+  }
+];
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Simple Java highlighter for the short lines we show
+function hl(src) {
+  const re = /("[^"]*")|\b(void)\b|\b(int|double|boolean|String|return|if|for|public|true|false)\b|\b([a-zA-Z]\w*)(?=\()|\b(\d+(?:\.\d+)?)\b/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    if (m[1]) out += '<span class="tok-s">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-v">' + m[2] + '</span>';
+    else if (m[3]) out += '<span class="tok-k">' + m[3] + '</span>';
+    else if (m[4]) out += '<span class="tok-m">' + m[4] + '</span>';
+    else out += '<span class="tok-n">' + m[5] + '</span>';
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+// ---- Meet the idea ----
+$('#mlist').innerHTML = METHODS.map((m) =>
+  '<div class="card method"><span class="sig">' + hl(m.sig) + '</span>' +
+  '<p>' + esc(m.plain) + ' <span style="color:var(--muted)">Gives back ' + m.gives + '.</span></p>' +
+  '<div class="ex good"><span class="mark" aria-label="right">✓</span><span>' + hl(m.good) + '</span><span class="arrow">→</span><span class="out">' + esc(m.out) + '</span></div>' +
+  '<div class="ex badx"><span class="mark" aria-label="wrong">✗</span><span>' + hl(m.bad) + '</span><span class="arrow">→</span><span class="why">' + esc(m.badWhy) + '</span></div></div>'
+).join('');
+
+// ---- Tabs ----
+function showTab(which) {
+  ['meet', 'practice'].forEach((id) => {
+    $('#' + id).hidden = id !== which;
+    $('#tab-' + id).setAttribute('aria-selected', String(id === which));
+  });
+}
+$('#tab-meet').onclick = () => showTab('meet');
+$('#tab-practice').onclick = () => showTab('practice');
+$('#start').onclick = () => { showTab('practice'); window.scrollTo(0, 0); };
+
+// ---- Practice ----
+let cur = 0;
+const state = S.map(() => ({ picks: [], solved: false, firstTry: null }));
+
+function render() {
+  const q = S[cur], st = state[cur];
+  $('#count').textContent = 'Scenario ' + (cur + 1) + ' of ' + S.length;
+  const right = state.filter((s) => s.firstTry === true).length;
+  const done = state.filter((s) => s.solved).length;
+  $('#score').textContent = done ? 'Right on the first try: ' + right + ' of ' + done : '';
+  $('#dots').innerHTML = S.map((_, i) => {
+    const s = state[i];
+    const cls = 'dot' + (i === cur ? ' here' : '') + (s.solved ? (s.firstTry ? ' right' : ' tried') : '');
+    return '<button class="' + cls + '" data-i="' + i + '" aria-label="Scenario ' + (i + 1) + '"></button>';
+  }).join('');
+  document.querySelectorAll('.dot').forEach((d) => d.onclick = () => { cur = +d.dataset.i; render(); });
+
+  let h = '<p class="story">' + q.story + '</p>';
+  h += '<div class="header">' + q.header.split('\n').map(hl).join('\n') + '</div>';
+  h += '<div class="sample"><span>' + esc(q.sample[0]) + '</span><span>' + esc(q.sample[1]) + '</span></div>';
+  h += '<p class="ask">' + esc(q.ask) + '</p><div class="opts">';
+  q.options.forEach((o, i) => {
+    let cls = 'opt';
+    if (st.picks.includes(i)) cls += o.ok ? ' right' : ' wrong';
+    h += '<button class="' + cls + '" data-o="' + i + '"' + (st.solved ? ' disabled' : '') + '><span class="k">' + (i + 1) + '</span><span>' + esc(o.t) + '</span></button>';
+  });
+  h += '</div><div id="fb" aria-live="polite">';
+  const lastPick = st.picks[st.picks.length - 1];
+  if (lastPick !== undefined && !q.options[lastPick].ok) {
+    h += '<div class="feedback bad"><span class="fbh">Not this one.</span>' + esc(q.options[lastPick].why) + ' Try again.</div>';
+  }
+  if (st.solved) {
+    h += '<div class="feedback good"><span class="fbh">' + (st.firstTry ? 'Yes! First try.' : 'Yes, that’s the one.') + '</span>' + q.why + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="reveal"' + (st.solved ? '' : ' hidden') + '>';
+  h += '<span class="step-h">See it in code</span><div class="java">';
+  q.code.forEach(([src, cm]) => {
+    h += '<div class="line' + (cm ? ' hot' : '') + '"><span class="src">' + hl(src) + '</span><span class="cm">' + (cm ? '// ' + esc(cm) : '') + '</span></div>';
+  });
+  h += '</div>';
+  h += '<span class="step-h">Try it with the example</span><div class="trace">' + q.trace.map((t) => '<div>' + esc(t) + '</div>').join('') + '</div>';
+  h += '<div class="tip"><b>Watch out:</b> ' + q.tip + '</div></div>';
+  $('#qcard').innerHTML = h;
+
+  document.querySelectorAll('.opt').forEach((b) => b.onclick = () => pick(+b.dataset.o));
+  $('#prev').disabled = cur === 0;
+  $('#next').textContent = cur === S.length - 1 ? 'Finish' : 'Next scenario →';
+}
+
+function pick(i) {
+  const q = S[cur], st = state[cur];
+  if (st.solved || st.picks.includes(i)) return;
+  st.picks.push(i);
+  if (st.firstTry === null) st.firstTry = !!q.options[i].ok;
+  if (q.options[i].ok) st.solved = true;
+  render();
+  if (st.solved) document.querySelector('.reveal').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function finish() {
+  const right = state.filter((s) => s.firstTry === true).length;
+  const done = state.filter((s) => s.solved).length;
+  $('#count').textContent = 'All done!';
+  $('#dots').innerHTML = '';
+  $('#qcard').innerHTML = '<div class="done card" style="border:none;padding:0"><h2>Nice work!</h2>' +
+    '<p>You finished ' + done + ' of ' + S.length + ' scenarios and got <b>' + right + '</b> right on the first try.</p>' +
+    '<p class="lead">Remember: look at the word before the name. void → call it alone. Anything else → save it in a variable of that type.</p>' +
+    '<button class="go" id="again" style="align-self:center">Start over</button></div>';
+  $('#again').onclick = () => { state.forEach((s) => { s.picks = []; s.solved = false; s.firstTry = null; }); cur = 0; render(); };
+  $('#next').textContent = 'Finish';
+}
+
+$('#prev').onclick = () => { if (cur > 0) { cur--; render(); } };
+$('#next').onclick = () => { if (cur < S.length - 1) { cur++; render(); window.scrollTo(0, 0); } else finish(); };
+document.addEventListener('keydown', (e) => {
+  if ($('#practice').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key >= '1' && e.key <= '4') pick(+e.key - 1);
+  else if (e.key === 'ArrowRight') $('#next').click();
+  else if (e.key === 'ArrowLeft') $('#prev').click();
+});
+render();
+</script>
+</body>
+</html>
