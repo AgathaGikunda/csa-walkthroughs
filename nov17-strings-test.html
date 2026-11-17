@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nov 17th Strings Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a projector stepper. Task strip on top, pseudocode and Java side by side, one caption bar below. */
+:root {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --ink: #1b2232;
+  --muted: #5a6478;
+  --rule: #d7dde8;
+  --accent: #2c56c9;
+  --hl: #ffe27a;
+  --hl-ink: #1b2232;
+  --link: #dbe6ff;
+  --kw: #2c56c9;
+  --str: #1d7a52;
+  --num: #a24a12;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+    --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+    --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245;
+  --accent: #8eaeff; --hl: #5b4a10; --hl-ink: #fff2c2; --link: #1e3156;
+  --kw: #8eaeff; --str: #6fd3a4; --num: #f0a36b; color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-text);
+  font-size: clamp(15px, 1.25vw, 19px); line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  box-sizing: border-box;
+}
+.app { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+.spacer { flex: 1; }
+.counter { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.task {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline;
+}
+.task code { font-family: var(--font-code); font-size: 0.95em; }
+.sig { font-family: var(--font-code); font-weight: 600; }
+.task .ex { color: var(--muted); }
+
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 14px; flex: 1; }
+@media (max-width: 880px) { .panes { grid-template-columns: minmax(0, 1fr); } }
+.pane { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 0; min-width: 0; display: flex; flex-direction: column; }
+.pane h2 {
+  margin: 0 18px 10px; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.lines { overflow-x: auto; }
+.ln {
+  display: grid; grid-template-columns: 2.6em minmax(0, 1fr); align-items: start;
+  padding: 3px 18px 3px 0; border-left: 5px solid transparent;
+  transition: background-color 0.25s, opacity 0.25s;
+}
+.ln .no { color: var(--muted); text-align: right; padding-right: 0.9em; font-family: var(--font-code); font-size: 0.8em; padding-top: 0.25em; }
+.ln .tx { white-space: pre-wrap; }
+.pseudo .ln { font-size: 1.12em; }
+.java .ln .tx { font-family: var(--font-code); white-space: pre; font-size: 1.02em; }
+.ln.pending { visibility: hidden; }
+.ln.now { background: var(--hl); color: var(--hl-ink); border-left-color: var(--accent); }
+.ln.now .no { color: var(--hl-ink); }
+.ln.linked { background: var(--link); border-left-color: var(--accent); }
+.kw { color: var(--kw); font-weight: 600; }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.ln.now .kw, .ln.now .str, .ln.now .num { color: inherit; }
+
+.caption {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+}
+.caption .where { font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.caption .say { flex: 1 1 320px; font-size: 1.1em; min-width: 0; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-weight: 700; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:focus-visible, .tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hint { color: var(--muted); font-size: 0.85em; }
+@media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>Nov 17th Strings Test</h1>
+    <div class="tabs" role="tablist" aria-label="Question part">
+      <button class="tab" role="tab" id="tab-a" data-part="a" aria-selected="true">(a) generateUsername: for loop</button>
+      <button class="tab" role="tab" id="tab-a2" data-part="a2" aria-selected="false">(a) generateUsername: while loop</button>
+      <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">(b) maskEmail</button>
+    </div>
+
+    <div class="spacer"></div>
+    <span class="counter" id="counter" aria-live="polite"></span>
+  </header>
+
+  <section class="task" id="task" aria-label="The task"></section>
+
+  <main class="panes">
+    <section class="pane pseudo" aria-label="Pseudocode">
+      <h2><span>Pseudocode</span><span id="pseudo-count"></span></h2>
+      <div class="lines" id="pseudo"></div>
+    </section>
+    <section class="pane java" aria-label="Java solution">
+      <h2><span>Java solution</span><span id="code-count"></span></h2>
+      <div class="lines" id="code"></div>
+    </section>
+  </main>
+
+  <section class="caption" aria-live="polite">
+    <span class="where" id="where"></span>
+    <span class="say" id="say"></span>
+    <div class="controls">
+      <button class="btn" id="back">← Back</button>
+      <button class="btn primary" id="next">Next →</button>
+      <button class="btn" id="all">Show all</button>
+      <button class="btn" id="restart">Restart</button>
+      <button class="btn" id="full">Full screen</button>
+    </div>
+  </section>
+  <p class="hint">Next: → , Space or Page Down (presentation clickers work). Back: ← or Page Up. Restart: Home.</p>
+</div>
+
+<script>
+const PARTS = {
+  a: {
+    sig: "public String generateUsername(String first, String last)",
+    task: "Build the base username: the first letter of <code>first</code> followed by all of <code>last</code>. If it is taken, add 1, then 2, then 3, and so on, and return the first one that is free. Use <code>isTaken</code> to check.",
+    ex: "Taken: jlee, jlee1, mrivera. \"jordan\", \"lee\" → \"jlee2\" · \"maria\", \"rivera\" → \"mrivera1\" · \"sam\", \"ortiz\" → \"sortiz\"",
+    start: "This tab solves part (a) with a for loop. The while loop tab is another way to get full credit. Press Next to start.",
+    pseudo: [
+      { t: "Build base: the first letter of first, then all of last.", say: "For \"jordan\" and \"lee\", the base is \"jlee\"." },
+      { t: "Set name to base. It is the first username we try.", say: "We always try the plain base first. It only gets a number if it is taken." },
+      { t: "Ask isTaken(name). Save the answer in taken.", say: "Check the name once and remember the yes or no answer." },
+      { t: "For num from 1, as long as taken is true:", say: "Keep trying new names while the last one was taken. If the base is free, the loop never runs." },
+      { t: "    Set name to base followed by num.", say: "Always build from base. Building from name would give \"jlee12\" instead of \"jlee2\"." },
+      { t: "    Ask isTaken(name) again. Save the new answer in taken.", say: "Check the new name, so the loop knows whether to keep going." },
+      { t: "After the loop, return name.", say: "The loop only stops when name is free, so name is the answer." }
+    ],
+    code: [
+      { t: "public String generateUsername(String first, String last)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    String base = first.substring(0, 1) + last;", s: 2 },
+      { t: "    String name = base;", s: 3 },
+      { t: "    boolean taken = isTaken(name);", s: 4 },
+      { t: "    for (int num = 1; taken == true; num++)", s: 5 },
+      { t: "    {", s: 5 },
+      { t: "        name = base + num;", s: 6 },
+      { t: "        taken = isTaken(name);", s: 7 },
+      { t: "    }", s: 7 },
+      { t: "    return name;", s: 8 },
+      { t: "}", s: 8 }
+    ],
+    steps: [
+      { maps: [], say: "The header is given. It returns a String: the username." },
+      { maps: [0], say: "substring(0, 1) is the first letter, \"j\". Adding last with + gives \"jlee\". No charAt needed." },
+      { maps: [1], say: "name starts as base, so the base is checked first." },
+      { maps: [2], say: "Call isTaken, the method the class gives you, and save its true or false answer. \"jlee\" is taken, so taken is true." },
+      { maps: [3], say: "Keep looping while taken == true. Careful: taken == false would stop the loop right away. num starts at 1, and num++ moves to the next number after each try." },
+      { maps: [4], say: "A String + an int makes a String: \"jlee\" + 1 is \"jlee1\". Use base here, not name." },
+      { maps: [5], say: "Check the new name and save the answer. Forget this line and taken stays true, so the loop never stops." },
+      { maps: [6], say: "Return after the loop. \"jlee\" and \"jlee1\" are taken, so \"jordan\", \"lee\" returns \"jlee2\"." }
+    ]
+  },
+  a2: {
+    sig: "public String generateUsername(String first, String last)",
+    task: "Build the base username: the first letter of <code>first</code> followed by all of <code>last</code>. If it is taken, add 1, then 2, then 3, and so on, and return the first one that is free. Use <code>isTaken</code> to check.",
+    ex: "Taken: jlee, jlee1, mrivera. \"jordan\", \"lee\" → \"jlee2\" · \"maria\", \"rivera\" → \"mrivera1\" · \"sam\", \"ortiz\" → \"sortiz\"",
+    start: "This tab solves part (a) with a while loop. The for loop tab is another way to get full credit. Press Next to start.",
+    pseudo: [
+      { t: "Build base: the first letter of first, then all of last.", say: "For \"jordan\" and \"lee\", the base is \"jlee\"." },
+      { t: "Set name to base. Set num to 1.", say: "We always try the plain base first. The first number we add is 1." },
+      { t: "Ask isTaken(name). Save the answer in taken.", say: "Check the name once and remember the yes or no answer." },
+      { t: "While taken is true:", say: "Keep trying new names while the last one was taken. If the base is free, the loop never runs." },
+      { t: "    Set name to base followed by num.", say: "Always build from base. Building from name would give \"jlee12\" instead of \"jlee2\"." },
+      { t: "    Add 1 to num. Ask isTaken(name) again and save it in taken.", say: "Get ready for the next number, and check the new name so the loop knows whether to keep going." },
+      { t: "After the loop, return name.", say: "The loop only stops when name is free, so name is the answer." }
+    ],
+    code: [
+      { t: "public String generateUsername(String first, String last)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    String base = first.substring(0, 1) + last;", s: 2 },
+      { t: "    String name = base;", s: 3 },
+      { t: "    int num = 1;", s: 3 },
+      { t: "    boolean taken = isTaken(name);", s: 4 },
+      { t: "    while (taken == true)", s: 5 },
+      { t: "    {", s: 5 },
+      { t: "        name = base + num;", s: 6 },
+      { t: "        num++;", s: 7 },
+      { t: "        taken = isTaken(name);", s: 7 },
+      { t: "    }", s: 7 },
+      { t: "    return name;", s: 8 },
+      { t: "}", s: 8 }
+    ],
+    steps: [
+      { maps: [], say: "The header is given. It returns a String: the username." },
+      { maps: [0], say: "substring(0, 1) is the first letter, \"j\". Adding last with + gives \"jlee\". No charAt needed." },
+      { maps: [1], say: "name starts as base, so the base is checked first. In a while loop, num is set up before the loop." },
+      { maps: [2], say: "Call isTaken, the method the class gives you, and save its true or false answer. \"jlee\" is taken, so taken is true." },
+      { maps: [3], say: "Same check as the for loop: keep looping while taken == true. A while loop has no place for num, so num is set up before it and changed inside it." },
+      { maps: [4], say: "A String + an int makes a String: \"jlee\" + 1 is \"jlee1\". Use base here, not name." },
+      { maps: [5], say: "num++ gets the next number ready. Then check the new name. Forget the isTaken line and taken stays true, so the loop never stops." },
+      { maps: [6], say: "Return after the loop. \"jlee\" and \"jlee1\" are taken, so \"jordan\", \"lee\" returns \"jlee2\"." }
+    ]
+  },
+  b: {
+    sig: "public String maskEmail(String email)",
+    task: "Keep the first character of <code>email</code>. Replace every other character before the <code>\"@\"</code> with <code>\"*\"</code>. Keep the <code>\"@\"</code> and everything after it.",
+    ex: "\"jordan@school.org\" → \"j*****@school.org\" · \"ab@mail.com\" → \"a*@mail.com\" · \"x@site.net\" → \"x@site.net\"",
+    start: "Read the task together. Press Next to start the pseudocode.",
+    pseudo: [
+      { t: "Find where the \"@\" is. Save it as at.", say: "Everything depends on where the \"@\" is." },
+      { t: "Start result with the first character of email.", say: "The first character always stays." },
+      { t: "For each index i from 1 up to (not including) at:", say: "These are the characters between the first one and the \"@\". They get hidden." },
+      { t: "    Add one \"*\" to result.", say: "One star for each hidden character." },
+      { t: "Add the \"@\" and everything after it, then return result.", say: "The \"@\" and the domain stay as they are." }
+    ],
+    code: [
+      { t: "public String maskEmail(String email)", s: 1 },
+      { t: "{", s: 1 },
+      { t: "    int at = email.indexOf(\"@\");", s: 2 },
+      { t: "    String result = email.substring(0, 1);", s: 3 },
+      { t: "    for (int i = 1; i < at; i++)", s: 4 },
+      { t: "    {", s: 4 },
+      { t: "        result += \"*\";", s: 5 },
+      { t: "    }", s: 5 },
+      { t: "    return result + email.substring(at);", s: 6 },
+      { t: "}", s: 6 }
+    ],
+    steps: [
+      { maps: [], say: "The header is given. It returns a String: the hidden email." },
+      { maps: [0], say: "indexOf(\"@\") gives the index of the \"@\". In \"jordan@school.org\" it is 6." },
+      { maps: [1], say: "substring(0, 1) is the first character, \"j\"." },
+      { maps: [2], say: "i goes from 1 to at - 1, so we add at - 1 stars: 5 for \"jordan\". Use < not <=, or the \"@\" becomes a star too." },
+      { maps: [3], say: "+= adds one star to the end of result each time." },
+      { maps: [4], say: "substring(at) starts at the \"@\" and goes to the end. The result is \"j*****@school.org\". For \"x@site.net\", at is 1, so the loop never runs." }
+    ]
+  }
+};
+const $ = (id) => document.getElementById(id);
+let part = "a";
+let step = 0;
+let showAll = false;
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function highlight(src) {
+  return esc(src).replace(/("[^"]*")|\b(public|int|boolean|for|while|if|return|String|false)\b|\b(\d+)\b/g, (m, str, kw, num) => {
+    if (str) return '<span class="str">' + str + "</span>";
+    if (kw) return '<span class="kw">' + kw + "</span>";
+    return '<span class="num">' + num + "</span>";
+  });
+}
+function total(p) { return 1 + p.pseudo.length + p.steps.length; }
+
+function renderStatic() {
+  const p = PARTS[part];
+  $("task").innerHTML = '<span class="sig">' + esc(p.sig) + '</span><span>' + p.task + '</span><span class="ex">' + esc(p.ex) + "</span>";
+  $("pseudo").innerHTML = p.pseudo.map((l, i) =>
+    '<div class="ln" data-i="' + i + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + esc(l.t) + "</span></div>").join("");
+  $("code").innerHTML = p.code.map((l, i) =>
+    '<div class="ln" data-s="' + l.s + '"><span class="no">' + (i + 1) + '</span><span class="tx">' + highlight(l.t) + "</span></div>").join("");
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.part === part)));
+}
+
+function render() {
+  const p = PARTS[part];
+  const nP = p.pseudo.length, nC = p.steps.length, last = total(p) - 1;
+  if (showAll) step = last;
+  const pseudoShown = Math.min(step, nP);
+  const codeStep = Math.max(0, step - nP);
+
+  document.querySelectorAll("#pseudo .ln").forEach((el) => {
+    const i = Number(el.dataset.i);
+    el.classList.toggle("pending", i >= pseudoShown);
+    el.classList.toggle("now", !showAll && codeStep === 0 && i === pseudoShown - 1);
+    const linked = !showAll && codeStep > 0 && p.steps[codeStep - 1].maps.includes(i);
+    el.classList.toggle("linked", linked);
+  });
+  document.querySelectorAll("#code .ln").forEach((el) => {
+    const s = Number(el.dataset.s);
+    el.classList.toggle("pending", s > codeStep);
+    el.classList.toggle("now", !showAll && s === codeStep);
+    el.classList.remove("linked");
+  });
+
+  let where, say;
+  if (showAll) { where = "Full solution"; say = "Everything is showing. Press Restart to step through again."; }
+  else if (step === 0) { where = "The task"; say = p.start; }
+  else if (codeStep === 0) { where = "Pseudocode · line " + step + " of " + nP; say = p.pseudo[step - 1].say; }
+  else { where = "Java · step " + codeStep + " of " + nC; say = p.steps[codeStep - 1].say; }
+  $("where").textContent = where;
+  $("say").textContent = say;
+  $("pseudo-count").textContent = pseudoShown + " / " + nP;
+  $("code-count").textContent = codeStep + " / " + nC;
+  $("counter").textContent = "Step " + step + " of " + last;
+  $("back").disabled = step === 0;
+  $("next").disabled = step === last;
+  $("all").textContent = showAll ? "Step mode" : "Show all";
+
+  const now = document.querySelector(".ln.now");
+  if (now && now.scrollIntoView) now.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function go(d) {
+  const last = total(PARTS[part]) - 1;
+  showAll = false;
+  step = Math.max(0, Math.min(last, step + d));
+  render();
+}
+function setPart(p, fromHash) {
+  if (!PARTS[p]) p = "a";
+  part = p; step = 0; showAll = false;
+  if (!fromHash) { try { history.replaceState(null, "", "#part-" + p); } catch (e) { location.hash = "part-" + p; } }
+  renderStatic(); render();
+}
+
+$("next").addEventListener("click", () => go(1));
+$("back").addEventListener("click", () => go(-1));
+$("restart").addEventListener("click", () => { showAll = false; step = 0; render(); });
+$("all").addEventListener("click", () => { if (showAll) { showAll = false; step = 0; } else { showAll = true; } render(); });
+$("full").addEventListener("click", () => {
+  const el = document.documentElement;
+  try {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  } catch (e) {}
+});
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setPart(t.dataset.part)));
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) {
+    if (e.key === "Enter" && e.target.tagName === "BUTTON") return;
+    e.preventDefault(); go(1);
+  } else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(-1); }
+  else if (e.key === "Home") { e.preventDefault(); showAll = false; step = 0; render(); }
+});
+function fromHash() { const m = location.hash.match(/^#part-(a|a2|b)$/); setPart(m ? m[1] : "a", true); }
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
+</body>
+</html>
