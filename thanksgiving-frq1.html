@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thanksgiving FRQ 1 Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #eef1f6; --surface: #ffffff; --ink: #1b2232; --muted: #5a6478; --rule: #d7dde8; --accent: #2c56c9;
+  --code-bg: #f4f6fb; --method: #8a3fb8; --str: #1d7a52; --num: #b5531c; --comment: #6b7487;
+  --good: #1d7a52; --good-bg: #e3f4ec; --bad: #b53a2a; --bad-bg: #fbe9e6; --tip-bg: #fff4d6; --tip-rule: #e2b43c;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245; --accent: #8eaeff;
+    --code-bg: #121826; --method: #d29bf5; --str: #7fd6a8; --num: #f3a66f; --comment: #8590a6;
+    --good: #7fd6a8; --good-bg: #16302a; --bad: #f29b8c; --bad-bg: #3a1f1c; --tip-bg: #33290f; --tip-rule: #b8902a;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 18px; line-height: 1.5;
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+a { color: var(--accent); }
+a.home { font-weight: 700; text-decoration: none; }
+h1 { margin: 0; font-size: 1.8em; line-height: 1.2; text-wrap: balance; }
+h2 { margin: 0; font-size: 1.25em; }
+h3 { margin: 0; font-size: 1em; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 6px; }
+.lead { color: var(--muted); }
+
+.progress { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.progress .track { flex: 1; min-width: 160px; height: 12px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+.progress .fill { height: 100%; width: 0; background: var(--good); border-radius: 999px; transition: width 0.3s ease; }
+.progress .ptxt { font-weight: 700; color: var(--muted); font-size: 0.92em; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 2px solid var(--rule); position: sticky; top: 0; background: var(--bg); z-index: 5; padding-top: 6px; }
+.tab {
+  font: inherit; font-weight: 700; font-size: 0.95em; padding: 8px 14px; border: 2px solid transparent; border-bottom: none;
+  border-radius: 10px 10px 0 0; background: none; color: var(--muted); cursor: pointer; margin-bottom: -2px; display: inline-flex; align-items: center; gap: 6px;
+}
+.tab[aria-selected="true"] { background: var(--surface); color: var(--accent); border-color: var(--rule); border-bottom: 2px solid var(--surface); }
+.tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.tab .tick { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); }
+.tab.done .tick { background: var(--good); }
+
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.panel[hidden] { display: none; }
+.ph { font-size: 1.45em; }
+.goal { background: var(--surface); border-left: 5px solid var(--accent); border-radius: 10px; padding: 12px 16px; }
+.review { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+.rv-h { font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8em; }
+.card { background: var(--surface); border: 2px solid var(--rule); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card.mistake { border-color: color-mix(in srgb, var(--bad) 45%, var(--rule)); }
+.card.exit { border-color: var(--accent); }
+.card.apq { border-color: color-mix(in srgb, var(--good) 55%, var(--rule)); }
+.apq-h { font-weight: 700; color: var(--good); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8em; }
+.pill { display: inline-block; font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 10px; border-radius: 999px; vertical-align: middle; margin-right: 6px; }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.yes { color: var(--good); font-weight: 700; }
+.no { color: var(--bad); font-weight: 700; }
+
+code { font-family: var(--font-code); font-size: 0.86em; background: var(--code-bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+pre.java { margin: 0; background: var(--code-bg); border-radius: 10px; padding: 12px 16px; overflow-x: auto; font-size: 0.86em; line-height: 1.45; }
+pre.java code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+.tok-m { color: var(--method); font-weight: 700; }
+.tok-s { color: var(--str); }
+.tok-n { color: var(--num); }
+.tok-k { color: var(--accent); font-weight: 700; }
+.tok-c { color: var(--comment); font-style: italic; }
+
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+td code { white-space: nowrap; overflow-wrap: normal; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.tip { background: var(--tip-bg); border-left: 5px solid var(--tip-rule); border-radius: 10px; padding: 12px 14px; }
+.prob { border-top: 2px dashed var(--rule); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.q { display: flex; gap: 12px; align-items: flex-start; }
+.q > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; }
+.tag { flex: none; font-weight: 700; font-size: 0.85em; background: var(--accent); color: var(--surface); border-radius: 8px; padding: 2px 8px; margin-top: 2px; }
+details.ans { border: 2px solid var(--rule); border-radius: 10px; }
+details.ans summary { cursor: pointer; font-weight: 700; color: var(--accent); padding: 8px 14px; list-style: none; }
+details.ans summary::-webkit-details-marker { display: none; }
+details.ans summary::before { content: "▸ "; }
+details.ans[open] summary::before { content: "▾ "; }
+details.ans[open] { border-color: var(--good); }
+.ans-body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { font-weight: 700; text-decoration: none; background: var(--code-bg); border: 2px solid var(--rule); border-radius: 10px; padding: 6px 12px; }
+.links a:hover, .links a:focus-visible { border-color: var(--accent); }
+
+.days { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.dayc { font: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--rule); background: var(--code-bg); color: var(--ink); }
+.dayc:hover, .dayc:focus-visible { border-color: var(--accent); outline: none; }
+.dayc .dn { font-weight: 700; color: var(--accent); }
+.dayc.done { border-color: var(--good); }
+.dayc.done .dn::after { content: "  ✓ done"; color: var(--good); }
+
+.letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell { display: flex; flex-direction: column; align-items: center; min-width: 34px; border: 2px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.cell .ch { font-family: var(--font-code); font-weight: 700; padding: 3px 7px; }
+.cell .ix { font-family: var(--font-code); font-size: 0.72em; color: var(--muted); background: var(--code-bg); width: 100%; text-align: center; }
+.cell.on { border-color: var(--accent); }
+.cell.on .ch { background: var(--accent); color: var(--surface); }
+.cap { color: var(--muted); font-size: 0.9em; }
+
+.skel { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.skel > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.two { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.good-box, .bad-box { border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.good-box { background: var(--good-bg); } .good-box h3 { color: var(--good); }
+.bad-box { background: var(--bad-bg); } .bad-box h3 { color: var(--bad); }
+.checks { display: flex; flex-direction: column; gap: 8px; }
+.chk { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.chk input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--good); flex: none; }
+
+.mark { font: inherit; font-weight: 700; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--good); background: var(--surface); color: var(--good); cursor: pointer; }
+.mark .box { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--good); display: grid; place-items: center; }
+.mark[aria-pressed="true"] { background: var(--good-bg); }
+.mark[aria-pressed="true"] .box::after { content: "✓"; font-size: 0.85em; }
+.nav { display: flex; justify-content: space-between; gap: 10px; }
+.nav button { font: inherit; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+.nav button.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+@media (max-width: 560px) {
+  body { font-size: 17px; padding-top: 16px; }
+  .card { padding: 14px; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tab { padding: 6px 10px; font-size: 0.85em; white-space: nowrap; flex: none; }
+  .skel { grid-template-columns: minmax(0, 1fr); }
+}
+@media print {
+  .tabs, .nav, .mark, .progress, a.home { display: none !important; }
+  .panel[hidden] { display: flex !important; }
+  details.ans { display: none; }
+  .card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<main>
+  <a class="home" href="index.html">← All walkthroughs</a>
+  <h1>Thanksgiving FRQ 1 Walkthrough</h1>
+  <p class="lead">Six days, one to two hours a day. Come back to Unit 3 ready for FRQ 1.</p>
+  <div class="progress"><div class="track"><div class="fill" id="fill"></div></div><span class="ptxt" id="ptxt">0 of 6 days done</span></div>
+  <nav class="tabs" role="tablist" aria-label="Days"><button class="tab" role="tab" id="tab-start" data-p="start" aria-controls="p-start" aria-selected="false">Start</button><button class="tab" role="tab" id="tab-d1" data-p="d1" aria-controls="p-d1" aria-selected="false">Day 1<span class="tick" aria-hidden="true"></span></button><button class="tab" role="tab" id="tab-d2" data-p="d2" aria-controls="p-d2" aria-selected="false">Day 2<span class="tick" aria-hidden="true"></span></button><button class="tab" role="tab" id="tab-d3" data-p="d3" aria-controls="p-d3" aria-selected="false">Day 3<span class="tick" aria-hidden="true"></span></button><button class="tab" role="tab" id="tab-d4" data-p="d4" aria-controls="p-d4" aria-selected="false">Day 4<span class="tick" aria-hidden="true"></span></button><button class="tab" role="tab" id="tab-d5" data-p="d5" aria-controls="p-d5" aria-selected="false">Day 5<span class="tick" aria-hidden="true"></span></button><button class="tab" role="tab" id="tab-d6" data-p="d6" aria-controls="p-d6" aria-selected="false">Day 6<span class="tick" aria-hidden="true"></span></button><button class="tab" role="tab" id="tab-cheat" data-p="cheat" aria-controls="p-cheat" aria-selected="false">Cheat sheet</button></nav>
+  <section class="panel" id="p-start" role="tabpanel" aria-labelledby="tab-start" hidden><h2 class="ph">How to use this guide</h2>
+<section class="card">
+  <h2>Six days to FRQ 1 ready</h2>
+  <p>One to two hours a day. Each day fixes one skill that cost points on our Unit 2 test and the FRQ 1 Recovery Check, then you practise it on a real past AP question.</p>
+  <div class="days">
+    <button class="dayc" data-go="d1"><span class="dn">Day 1</span><span>Objects and instance methods</span></button>
+    <button class="dayc" data-go="d2"><span class="dn">Day 2</span><span>Brackets, braces and conditions</span></button>
+    <button class="dayc" data-go="d3"><span class="dn">Day 3</span><span>String methods</span></button>
+    <button class="dayc" data-go="d4"><span class="dn">Day 4</span><span>Math.random</span></button>
+    <button class="dayc" data-go="d5"><span class="dn">Day 5</span><span>The six FRQ 1 patterns</span></button>
+    <button class="dayc" data-go="d6"><span class="dn">Day 6</span><span>Timed practice</span></button>
+  </div>
+</section>
+<section class="card"><h2>You need</h2><ul><li>Your Unit 1 and Unit 2 slide decks</li><li>The Java Quick Reference</li><li>Paper and pencil, and a timer</li><li>Your CSAwesome login</li></ul></section><section class="card"><h2>Every day, the same routine</h2><div class="tw"><table><thead><tr><th>Step</th><th>Time</th><th>What you do</th></tr></thead><tbody><tr><td>1. Review</td><td>15–20 min</td><td>Go through the slides listed for the day. Say each rule out loud.</td></tr><tr><td>2. Key rules and example</td><td>15 min</td><td>Read the rules and the worked example. Cover the code and try to rewrite it.</td></tr><tr><td>3. Try it</td><td>30–45 min</td><td>Do the practice problems <b>by hand</b>, then open each answer. No running the code: there is no compiler on the exam.</td></tr><tr><td>4. Real AP question</td><td>20–30 min</td><td>Do the past AP question for the day, then mark it with the official scoring guidelines.</td></tr><tr><td>5. Exit ticket</td><td>5 min</td><td>Get it right before you move on. Then tick <b>Mark Day done</b> at the bottom.</td></tr></tbody></table></div></section><section class="card"><h2>Three rules</h2><ul><li><b>Write first, open the answer second.</b> Opening it early feels like learning, but it isn’t.</li><li>When you get something wrong, write the fix next to it in a different color. Those notes are your Unit 3 revision.</li><li>Boxes marked <span class="pill bad">Real mistake</span> come from our own class work, with names removed. If one looks familiar, spend extra time there.</li></ul></section><div class="tip"><b>Bring back on the first day after break:</b> a photo of your Day 6 timed work and your self-scored rubrics. Upload both before class.</div><div class="nav"><span></span><button class="primary" data-go="d1">Day 1 →</button></div></section>
+<section class="panel" id="p-d1" role="tabpanel" aria-labelledby="tab-d1" hidden><h2 class="ph">Day 1: Objects and instance methods</h2><p class="goal"><b>Today’s goal:</b> call every method on the right thing, in the right way. FRQ 1 always gives you objects and methods, and most lost points start with a wrong call.</p><div class="review"><span class="rv-h">Review in your slides</span><p>Unit 1 deck: slides 36–37 (void vs non-void), 52–54 (objects, references, null), 56–59 (constructors and <code>new</code>), 61–62 (calling instance methods, null crash).</p></div><section class="card"><h2>Key rules</h2><p>There are three ways to call a method. Ask: <b>where does this method live?</b></p><div class="tw"><table><thead><tr><th>Where the method lives</th><th>How you call it</th><th>Example</th></tr></thead><tbody><tr><td>Inside another object the class gives you</td><td><code>object.method(arguments)</code></td><td><code>driverTwo.getDeliveryTime(3)</code></td></tr><tr><td>In the class you are writing (a helper, or your part (a) method)</td><td><code>method(arguments)</code>, no dot</td><td><code>isMinuteFree(period, m)</code></td></tr><tr><td>A class (static) method, like Math</td><td><code>ClassName.method(arguments)</code></td><td><code>Math.random()</code></td></tr></tbody></table></div><ul><li><b>Non-void methods give back a value.</b> Store it or use it: <code>double t = driverTwo.getDeliveryTime(i);</code></li><li><b>Void methods just do a job.</b> Never store them: <code>oven.clean();</code></li><li><b>Arguments must match the header.</b> If the header says <code>getDeliveryTime(int order)</code>, the call needs one <code>int</code>.</li><li><b>Instance variables</b> are the <code>private</code> fields at the top of the class. Use them by name, anywhere in the class.</li><li><b>Parameters</b> are in the method header. They only exist inside that method.</li><li><b>Preconditions are promises.</b> “Precondition: numBirds &gt; 0” means you never need to check it.</li></ul></section><section class="card mistake"><h2><span class="pill bad">Real mistake</span> From the Recovery Check</h2><pre class="java"><code><span class="tok-k">int</span> fast1 = <span class="tok-n">0</span>;
+fast1.<span class="tok-m">getDeliveryTime</span>(i)         <span class="tok-c">// ✗ fast1 is an int counter. Numbers have no methods.</span>
+
+<span class="tok-k">int</span> driverOne = <span class="tok-n">0</span>;               <span class="tok-c">// ✗ reuses the object's name for a counter,</span>
+                                 <span class="tok-c">//   so driverOne is no longer the driver</span>
+
+slow.<span class="tok-m">getDeliveryTime</span>(order)      <span class="tok-c">// ✗ there is no object called slow</span>
+
+driverTwo.<span class="tok-m">getDeliveryTime</span>(order) <span class="tok-c">// ✓ the object the question gave you</span></code></pre><p>The fix is always the same: <b>copy the object names from the class information.</b> Give your own variables (counters, totals) <i>different</i> names.</p></section><section class="card"><h2>Worked example</h2><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> GardenTracker
+{
+    <span class="tok-k">private</span> Plant tomato;
+    <span class="tok-k">private</span> Plant basil;
+
+    <span class="tok-c">// Plant has these methods:</span>
+    <span class="tok-c">//   public double getHeight(int week)   // height in cm, 1 &lt;= week &lt;= 12</span>
+    <span class="tok-c">//   public boolean isFlowering(int week)</span>
+    <span class="tok-c">//   public void water()</span>
+
+    <span class="tok-c">/** Returns true if tomato is taller than basil in week w */</span>
+    <span class="tok-k">private</span> <span class="tok-k">boolean</span> <span class="tok-m">tomatoTaller</span>(<span class="tok-k">int</span> w)
+    { /* already written */ }
+
+    <span class="tok-c">/** Returns how many of weeks 1 to numWeeks tomato was taller than basil */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">weeksTomatoTaller</span>(<span class="tok-k">int</span> numWeeks)
+    { /* you write this */ }
+}</code></pre><p><b>Which calls work inside GardenTracker?</b></p><div class="tw"><table><thead><tr><th>Call</th><th>Works?</th><th>Why</th></tr></thead><tbody><tr><td><code>tomato.getHeight(3)</code></td><td><span class="yes">Yes</span></td><td>An object, a dot, the method, one int. Gives a double.</td></tr><tr><td><code>double h = basil.water();</code></td><td><span class="no">No</span></td><td><code>water</code> is void. It gives back nothing to store.</td></tr><tr><td><code>tomato.getHeight()</code></td><td><span class="no">No</span></td><td>The header needs an int week.</td></tr><tr><td><code>Plant.getHeight(3)</code></td><td><span class="no">No</span></td><td><code>getHeight</code> belongs to one plant, so it needs an object, not the class name.</td></tr><tr><td><code>tomatoTaller(5)</code></td><td><span class="yes">Yes</span></td><td>It’s in this class, so no dot. Gives a boolean.</td></tr><tr><td><code>if (basil.isFlowering(2))</code></td><td><span class="yes">Yes</span></td><td>A boolean call can be the whole condition.</td></tr></tbody></table></div><p>The solution calls the helper, with no dot:</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">weeksTomatoTaller</span>(<span class="tok-k">int</span> numWeeks)
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> w = <span class="tok-n">1</span>; w &lt;= numWeeks; w++)
+    {
+        <span class="tok-k">if</span> (<span class="tok-m">tomatoTaller</span>(w))
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count;
+}</code></pre></section><section class="card"><h2>Try it</h2><p>Use this class for D1.1 to D1.6.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> Bakery
+{
+    <span class="tok-k">private</span> Oven ovenA;
+    <span class="tok-k">private</span> Oven ovenB;
+
+    <span class="tok-c">// Oven has these methods:</span>
+    <span class="tok-c">//   public int getTemp(int hour)      // temperature at hour 1 to 8</span>
+    <span class="tok-c">//   public boolean isOn(int hour)</span>
+    <span class="tok-c">//   public void clean()</span>
+    <span class="tok-c">//   public String getName()</span>
+
+    <span class="tok-c">/** Returns true if both ovens are on at hour h. Already written. */</span>
+    <span class="tok-k">private</span> <span class="tok-k">boolean</span> <span class="tok-m">bothOn</span>(<span class="tok-k">int</span> h)
+    { /* implementation not shown */ }
+}</code></pre><div class="prob"><div class="q"><span class="tag">D1.1</span><div>For each call, write what type it gives back, or “won’t compile” and why.<ol><li><code>ovenA.getTemp(2)</code></li><li><code>ovenB.isOn()</code></li><li><code>int t = ovenA.clean();</code></li><li><code>Oven.getTemp(4)</code></li><li><code>ovenB.getName().length()</code></li><li><code>bothOn(3)</code>, written inside Bakery</li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li><code>int</code></li><li>Won’t compile: <code>isOn</code> needs an int hour.</li><li>Won’t compile: <code>clean</code> is void, so there is nothing to store.</li><li>Won’t compile: <code>getTemp</code> belongs to an oven, so it needs an object like <code>ovenA</code>, not the class name.</li><li><code>int</code>. <code>getName()</code> gives a String, and <code>.length()</code> on that String gives an int.</li><li><code>boolean</code>. It’s in this class, so no dot.</li></ol></div></details></div><div class="prob"><div class="q"><span class="tag">D1.2</span><div>Write one line that stores ovenB’s temperature at hour 5.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">int</span> t = ovenB.<span class="tok-m">getTemp</span>(<span class="tok-n">5</span>);</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D1.3</span><div>Write an <code>if</code> header that is true when ovenA is on at hour <code>h</code>.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">if</span> (ovenA.<span class="tok-m">isOn</span>(h))</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D1.4</span><div>Find and fix the mistake.<pre class="java"><code><span class="tok-k">int</span> ovenA = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> h = <span class="tok-n">1</span>; h &lt;= <span class="tok-n">8</span>; h++)
+{
+    <span class="tok-k">if</span> (ovenA.<span class="tok-m">getTemp</span>(h) &gt; <span class="tok-n">200</span>)
+    {
+        ovenA++;
+    }
+}</code></pre></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><p>The counter is named <code>ovenA</code>, which hides the oven, and an int has no methods. Give the counter its own name:</p><pre class="java"><code><span class="tok-k">int</span> hotHours = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> h = <span class="tok-n">1</span>; h &lt;= <span class="tok-n">8</span>; h++)
+{
+    <span class="tok-k">if</span> (ovenA.<span class="tok-m">getTemp</span>(h) &gt; <span class="tok-n">200</span>)
+    {
+        hotHours++;
+    }
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D1.5</span><div>Write <code>public int hotterHours()</code>. It returns how many of hours 1 to 8 ovenA was hotter than ovenB.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">hotterHours</span>()
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> h = <span class="tok-n">1</span>; h &lt;= <span class="tok-n">8</span>; h++)
+    {
+        <span class="tok-k">if</span> (ovenA.<span class="tok-m">getTemp</span>(h) &gt; ovenB.<span class="tok-m">getTemp</span>(h))
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count;
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D1.6</span><div>Write <code>public int firstBothOn()</code>. It returns the first hour from 1 to 8 when both ovens are on, or −1 if there is none. Use <code>bothOn</code>. Assume it works.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">firstBothOn</span>()
+{
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> h = <span class="tok-n">1</span>; h &lt;= <span class="tok-n">8</span>; h++)
+    {
+        <span class="tok-k">if</span> (<span class="tok-m">bothOn</span>(h))           <span class="tok-c">// not ovenA.bothOn(h): bothOn belongs to Bakery</span>
+        {
+            <span class="tok-k">return</span> h;
+        }
+    }
+    <span class="tok-k">return</span> -<span class="tok-n">1</span>;                   <span class="tok-c">// only after checking all 8 hours</span>
+}</code></pre></div></details></div></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>2022 FRQ 1 Game, part (a)</h2><p>Do part (a) <code>getScore</code> only, about 20 minutes. It is all about calling methods on <code>Level</code> objects inside if statements. Save part (b) for Day 5.</p><div class="links"><a href="https://runestone.academy/ns/books/published/csawesome2/frq-game-score.html" target="_blank" rel="noopener">Open in CSAwesome</a><a href="https://apcentral.collegeboard.org/media/pdf/ap22-frq-computer-science-a.pdf" target="_blank" rel="noopener">Official 2022 questions (PDF), question 1</a></div><details class="ans"><summary>Show key ideas</summary><div class="ans-body"><p>Start a score at 0. Add <code>levelOne.getPoints()</code> only if <code>levelOne.goalReached()</code>. Check level two only inside the level one if, and level three only inside the level two if. After that, if <code>isBonus()</code>, triple the score. Return it.</p></div></details></section><section class="card exit"><h2>Exit ticket</h2><p>A class has <code>private Scoreboard home;</code> and Scoreboard has <code>public int getGoals(int game)</code>. Write the line that stores home’s goals in game 4.</p><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">int</span> g = home.<span class="tok-m">getGoals</span>(<span class="tok-n">4</span>);</code></pre></div></details></section><button class="mark" data-day="1" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="lbl">Mark Day 1 done</span></button><div class="nav"><button data-go="start">← Start</button><button class="primary" data-go="d2">Day 2 →</button></div></section>
+<section class="panel" id="p-d2" role="tabpanel" aria-labelledby="tab-d2" hidden><h2 class="ph">Day 2: Brackets, braces and conditions</h2><p class="goal"><b>Today’s goal:</b> put every bracket in the right place without thinking, and write conditions with <code>&amp;&amp;</code>, <code>||</code> and <code>!</code> correctly.</p><div class="review"><span class="rv-h">Review in your slides</span><p>Unit 2 deck: slides 12–17 (if, if-else, nested if, if-else-if), 19–22 (logical operators, short-circuit, equivalent expressions), 32–33 (for loop parts and the order they run). Unit 1 deck: slides 38 and 46 (calls that won’t compile).</p></div><section class="card"><h2>Key rules: where things go</h2><div class="tw"><table><thead><tr><th>What</th><th>Rule</th><th>Example</th></tr></thead><tbody><tr><td>Method call</td><td>Always <code>()</code>, even when empty</td><td><code>s.length()</code>, <code>play()</code></td></tr><tr><td><code>if</code> / <code>while</code></td><td>Condition inside <code>()</code></td><td><code>if (count == 3)</code></td></tr><tr><td><code>for</code></td><td>Three parts inside <code>()</code>, split by <code>;</code></td><td><code>for (int i = 1; i &lt;= n; i++)</code></td></tr><tr><td><code>else</code></td><td><b>Never</b> takes a condition</td><td><code>else</code> or <code>else if (x &gt; 5)</code></td></tr><tr><td>Opening <code>{</code></td><td>After the <code>)</code></td><td><code>if (a &lt; b) {</code></td></tr><tr><td>Closing <code>}</code></td><td>One for every <code>{</code>. Close the loop <b>before</b> <code>return</code>.</td><td></td></tr><tr><td>Semicolons</td><td>End every statement. <b>Never</b> right after <code>for (...)</code> or <code>if (...)</code></td><td><code>count++;</code></td></tr></tbody></table></div><div class="tip"><b>Brace check:</b> after writing, put your finger on each { and find its }. Code inside a pair is indented one step. If the indents and the braces disagree, the braces win.</div></section><section class="card mistake"><h2><span class="pill bad">Real mistake</span> From the Recovery Check</h2><pre class="java"><code>{<span class="tok-k">for</span> (<span class="tok-k">int</span> order = <span class="tok-n">2</span>; order &lt;= numOrders; order++);  <span class="tok-c">// ✗ { before for, and ; ends the loop here</span>
+{<span class="tok-k">if</span> (d &gt; most)                                       <span class="tok-c">// ✗ { goes after the ), not before if</span>
+} <span class="tok-k">else</span> (a == b) {                                    <span class="tok-c">// ✗ else never has a condition</span>
+elif (y &gt; x)                                         <span class="tok-c">// ✗ Java has no elif. Write else if</span>
+} <span class="tok-k">if</span> (driverOne.<span class="tok-m">getDeliveryTime</span>(i) &gt; ...)            <span class="tok-c">// ✗ a stray } closes the loop early</span>
+driverOne.getDeliveryTime &lt; driverTwo...             <span class="tok-c">// ✗ the call is missing (i)</span></code></pre></section><section class="card"><h2>Compound conditions</h2><div class="tw"><table><thead><tr><th>Operator</th><th>Means</th><th>True when</th></tr></thead><tbody><tr><td><code>a &amp;&amp; b</code></td><td>and</td><td>both are true</td></tr><tr><td><code>a || b</code></td><td>or</td><td>at least one is true</td></tr><tr><td><code>!a</code></td><td>not</td><td><code>a</code> is false</td></tr></tbody></table></div><ul><li><b>Ranges need two full comparisons.</b> Write <code>x &gt;= 10 &amp;&amp; x &lt;= 20</code>, never <code>10 &lt;= x &lt;= 20</code>.</li><li><b>Each side is a full comparison.</b> Write <code>x == 3 || x == 5</code>, never <code>x == 3 || 5</code>.</li><li><b>Short-circuit protects you.</b> In <code>s.length() &gt; 0 &amp;&amp; s.substring(0, 1).equals("a")</code>, the substring never runs on an empty String.</li><li><b>Not, and, or:</b> <code>!(a &amp;&amp; b)</code> is the same as <code>!a || !b</code>. <code>!(a || b)</code> is the same as <code>!a &amp;&amp; !b</code>.</li><li><b>Booleans need no == true.</b> Write <code>if (oven.isOn(h))</code>.</li></ul></section><section class="card"><h2>Worked example: fix the method</h2><p>This method should count the orders where the two drivers’ times are less than 2 minutes apart. It has eight bracket and semicolon mistakes. Find them all before you open the fix.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">countClose</span>(<span class="tok-k">int</span> numOrders)
+{
+    <span class="tok-k">int</span> close = <span class="tok-n">0</span>;
+    {<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= numOrders; i++);
+        <span class="tok-k">double</span> a = driverOne.<span class="tok-m">getDeliveryTime</span>(i)
+        <span class="tok-k">double</span> b = driverTwo.getDeliveryTime
+        <span class="tok-k">if</span> Math.<span class="tok-m">abs</span>(a - b) &lt; <span class="tok-n">2</span>
+            close++
+    <span class="tok-k">return</span> close;
+}</code></pre><details class="ans"><summary>Show the fix</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">countClose</span>(<span class="tok-k">int</span> numOrders)
+{
+    <span class="tok-k">int</span> close = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= numOrders; i++)          <span class="tok-c">// 1. { moved after the )   2. ; removed</span>
+    {
+        <span class="tok-k">double</span> a = driverOne.<span class="tok-m">getDeliveryTime</span>(i);  <span class="tok-c">// 3. ; added</span>
+        <span class="tok-k">double</span> b = driverTwo.<span class="tok-m">getDeliveryTime</span>(i);  <span class="tok-c">// 4. (i) added   5. ; added</span>
+        <span class="tok-k">if</span> (Math.<span class="tok-m">abs</span>(a - b) &lt; <span class="tok-n">2</span>)                  <span class="tok-c">// 6. condition inside ( )</span>
+        {
+            close++;                              <span class="tok-c">// 7. ; added</span>
+        }
+    }                                             <span class="tok-c">// 8. loop closed before return</span>
+    <span class="tok-k">return</span> close;
+}</code></pre></div></details></section><section class="card"><h2>Try it</h2><div class="prob"><div class="q"><span class="tag">D2.1</span><div>Each snippet has one mistake. Write the fixed line.<ol><li><code>if (score &gt; 90) { grade = "A" }</code></li><li><code>for (int i = 0, i &lt; 10, i++)</code></li><li><code>if (name.length &gt; 3)</code></li><li><code>else (temp &lt; 50) { coat = true; }</code></li><li><code>while (count &lt; 5);</code></li><li><code>if (x &gt; 0 &amp;&amp; &lt; 10)</code></li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li><code>if (score &gt; 90) { grade = "A"; }</code></li><li><code>for (int i = 0; i &lt; 10; i++)</code></li><li><code>if (name.length() &gt; 3)</code></li><li><code>else if (temp &lt; 50) { coat = true; }</code></li><li><code>while (count &lt; 5)</code>. The ; made an empty loop that never ends.</li><li><code>if (x &gt; 0 &amp;&amp; x &lt; 10)</code></li></ol></div></details></div><div class="prob"><div class="q"><span class="tag">D2.2</span><div>Write each condition in Java.<ol><li><code>temp</code> is between 60 and 75, both included.</li><li><code>name</code> is "Ana" or "Ben" (Strings).</li><li>It is NOT both raining and cold (<code>boolean raining, cold</code>). Write it two ways.</li><li><code>s</code> is not empty and its first letter is "x".</li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li><code>temp &gt;= 60 &amp;&amp; temp &lt;= 75</code></li><li><code>name.equals("Ana") || name.equals("Ben")</code></li><li><code>!(raining &amp;&amp; cold)</code>, or <code>!raining || !cold</code></li><li><code>s.length() &gt; 0 &amp;&amp; s.substring(0, 1).equals("x")</code>. Keep this order: the length check stops the substring from running on an empty String.</li></ol></div></details></div><div class="prob"><div class="q"><span class="tag">D2.3</span><div>Which lines run on every pass of the loop? Which run only once? What is returned?<pre class="java"><code><span class="tok-k">int</span> total = <span class="tok-n">0</span>;                       <span class="tok-c">// line 1</span>
+<span class="tok-k">for</span> (<span class="tok-k">int</span> k = <span class="tok-n">1</span>; k &lt;= <span class="tok-n">4</span>; k++)         <span class="tok-c">// line 2</span>
+{
+    total += k;                      <span class="tok-c">// line 3</span>
+    <span class="tok-k">if</span> (total &gt; <span class="tok-n">5</span>)                   <span class="tok-c">// line 4</span>
+    {
+        total = total - <span class="tok-n">1</span>;           <span class="tok-c">// line 5</span>
+    }
+}
+<span class="tok-k">return</span> total;                        <span class="tok-c">// line 6</span></code></pre></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><p>Lines 3 and 4 run on every pass, and line 2 checks before each pass. Line 5 runs only when <code>total &gt; 5</code>. Lines 1 and 6 run once.</p><div class="tw"><table><thead><tr><th>k</th><th>after line 3</th><th>line 5 runs?</th><th>total</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>no</td><td>1</td></tr><tr><td>2</td><td>3</td><td>no</td><td>3</td></tr><tr><td>3</td><td>6</td><td>yes</td><td>5</td></tr><tr><td>4</td><td>9</td><td>yes</td><td>8</td></tr></tbody></table></div><p>It returns <b>8</b>.</p></div></details></div><div class="prob"><div class="q"><span class="tag">D2.4</span><div>Rewrite as a for loop.<pre class="java"><code><span class="tok-k">int</span> n = <span class="tok-n">3</span>;
+<span class="tok-k">while</span> (n &lt;= <span class="tok-n">15</span>)
+{
+    System.out.<span class="tok-m">println</span>(n);
+    n += <span class="tok-n">3</span>;
+}</code></pre></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">for</span> (<span class="tok-k">int</span> n = <span class="tok-n">3</span>; n &lt;= <span class="tok-n">15</span>; n += <span class="tok-n">3</span>)
+{
+    System.out.<span class="tok-m">println</span>(n);
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D2.5</span><div>A class has <code>private Station station;</code> and Station has <code>public int getHigh(int day)</code> and <code>public int getLow(int day)</code>. Write <code>public int niceDays(int numDays)</code>. It returns how many of days 1 to numDays had a high of at most 80 <b>and</b> a low of at least 50.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">niceDays</span>(<span class="tok-k">int</span> numDays)
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> day = <span class="tok-n">1</span>; day &lt;= numDays; day++)
+    {
+        <span class="tok-k">if</span> (station.<span class="tok-m">getHigh</span>(day) &lt;= <span class="tok-n">80</span> &amp;&amp; station.<span class="tok-m">getLow</span>(day) &gt;= <span class="tok-n">50</span>)
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count;
+}</code></pre></div></details></div></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>No new AP question today</h2><p>Go back to your Day 1 Game answer and do a brace check on it: match every { and }, and fix any else with a condition.</p></section><section class="card exit"><h2>Exit ticket</h2><p>Write a for loop over days 1 to 10 with an if / else if inside that counts <code>warm</code> days (high above 70) and <code>cold</code> days (high below 40) separately. Use <code>station.getHigh(day)</code>.</p><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">int</span> warm = <span class="tok-n">0</span>;
+<span class="tok-k">int</span> cold = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> day = <span class="tok-n">1</span>; day &lt;= <span class="tok-n">10</span>; day++)
+{
+    <span class="tok-k">int</span> high = station.<span class="tok-m">getHigh</span>(day);
+    <span class="tok-k">if</span> (high &gt; <span class="tok-n">70</span>)
+    {
+        warm++;
+    }
+    <span class="tok-k">else</span> <span class="tok-k">if</span> (high &lt; <span class="tok-n">40</span>)
+    {
+        cold++;
+    }
+}</code></pre></div></details></section><button class="mark" data-day="2" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="lbl">Mark Day 2 done</span></button><div class="nav"><button data-go="d1">← Day 1</button><button class="primary" data-go="d3">Day 3 →</button></div></section>
+<section class="panel" id="p-d3" role="tabpanel" aria-labelledby="tab-d3" hidden><h2 class="ph">Day 3: String methods</h2><p class="goal"><b>Today’s goal:</b> use the six Quick Reference String methods without guessing, and loop through a String safely.</p><div class="review"><span class="rv-h">Review in your slides</span><p>Unit 1 deck: slides 71 (positions start at 0), 72–77 (the six methods, one per slide), 78 (reading a username), 79 (recap). Unit 2 deck: slides 45–48 (one character at a time, and building a new String).</p></div><section class="card"><h2>Key rules</h2><p>All six are on the Java Quick Reference. Keep it open today.</p><div class="tw"><table><thead><tr><th>Method</th><th>Gives back</th><th>Remember</th></tr></thead><tbody><tr><td><code>s.length()</code></td><td>int</td><td>The last index is <code>length() - 1</code>.</td></tr><tr><td><code>s.substring(a, b)</code></td><td>String</td><td>From a up to, but <b>not</b> including, b. Its length is b − a.</td></tr><tr><td><code>s.substring(a)</code></td><td>String</td><td>From a to the end.</td></tr><tr><td><code>s.indexOf(str)</code></td><td>int</td><td>The <b>first</b> place str appears, or <b>−1</b> if it doesn’t.</td></tr><tr><td><code>s.equals(other)</code></td><td>boolean</td><td>Compare text with equals, never ==.</td></tr><tr><td><code>s.compareTo(other)</code></td><td>int</td><td>Negative: s comes first alphabetically. 0: same. Positive: s comes after.</td></tr></tbody></table></div><div class="letters" aria-label="thanksgiving with its index numbers"><span class="cell"><span class="ch">t</span><span class="ix">0</span></span><span class="cell"><span class="ch">h</span><span class="ix">1</span></span><span class="cell"><span class="ch">a</span><span class="ix">2</span></span><span class="cell"><span class="ch">n</span><span class="ix">3</span></span><span class="cell"><span class="ch">k</span><span class="ix">4</span></span><span class="cell"><span class="ch">s</span><span class="ix">5</span></span><span class="cell on"><span class="ch">g</span><span class="ix">6</span></span><span class="cell on"><span class="ch">i</span><span class="ix">7</span></span><span class="cell on"><span class="ch">v</span><span class="ix">8</span></span><span class="cell on"><span class="ch">i</span><span class="ix">9</span></span><span class="cell on"><span class="ch">n</span><span class="ix">10</span></span><span class="cell on"><span class="ch">g</span><span class="ix">11</span></span></div><p class="cap"><code>s.substring(6)</code> is highlighted: “giving”. The length is 12, so the last index is 11.</p><ul><li><b>One character:</b> <code>s.substring(i, i + 1)</code>.</li><li><b>Strings never change.</b> <code>name.substring(1);</code> on its own line does nothing. Store it: <code>name = name.substring(1);</code></li><li><b>Crashes:</b> any index below 0 or above <code>length()</code> throws an error. <code>substring(length())</code> is fine and gives "".</li></ul></section><section class="card"><h2>The four loop shapes</h2><pre class="java"><code><span class="tok-c">// 1. Visit every character</span>
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt; s.<span class="tok-m">length</span>(); i++)
+{
+    <span class="tok-k">String</span> ch = s.<span class="tok-m">substring</span>(i, i + <span class="tok-n">1</span>);
+}
+
+<span class="tok-c">// 2. Visit every piece of length k (stop early so i + k never passes the end)</span>
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt;= s.<span class="tok-m">length</span>() - k; i++)
+{
+    <span class="tok-k">String</span> piece = s.<span class="tok-m">substring</span>(i, i + k);
+}
+
+<span class="tok-c">// 3. Build a new String</span>
+<span class="tok-k">String</span> result = <span class="tok-s">""</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt; s.<span class="tok-m">length</span>(); i++)
+{
+    result = s.<span class="tok-m">substring</span>(i, i + <span class="tok-n">1</span>) + result;   <span class="tok-c">// adds to the front, so this reverses s</span>
+}
+
+<span class="tok-c">// 4. Split at a marker</span>
+<span class="tok-k">int</span> pos = s.<span class="tok-m">indexOf</span>(<span class="tok-s">","</span>);
+<span class="tok-k">String</span> before = s.<span class="tok-m">substring</span>(<span class="tok-n">0</span>, pos);
+<span class="tok-k">String</span> after = s.<span class="tok-m">substring</span>(pos + <span class="tok-n">1</span>);</code></pre></section><section class="card"><h2>Worked example: count double letters</h2><p><code>countDoubles("bookkeeper")</code> returns 3, for “oo”, “kk” and “ee”.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">countDoubles</span>(<span class="tok-k">String</span> word)
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt; word.<span class="tok-m">length</span>() - <span class="tok-n">1</span>; i++)       <span class="tok-c">// stop 1 early: we look at i + 1</span>
+    {
+        <span class="tok-k">String</span> now = word.<span class="tok-m">substring</span>(i, i + <span class="tok-n">1</span>);
+        <span class="tok-k">String</span> next = word.<span class="tok-m">substring</span>(i + <span class="tok-n">1</span>, i + <span class="tok-n">2</span>);
+        <span class="tok-k">if</span> (now.<span class="tok-m">equals</span>(next))                         <span class="tok-c">// equals, not ==</span>
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count;
+}</code></pre><p>Why <code>word.length() - 1</code>? On the last pass, i + 2 must still be at most length(). If the loop went to <code>i &lt; word.length()</code>, the last <code>substring(i + 1, i + 2)</code> would crash.</p></section><section class="card"><h2>Try it</h2><div class="prob"><div class="q"><span class="tag">D3.1</span><div><code>String s = "thanksgiving";</code> What does each give back?<div class="letters" aria-label="thanksgiving with its index numbers"><span class="cell"><span class="ch">t</span><span class="ix">0</span></span><span class="cell"><span class="ch">h</span><span class="ix">1</span></span><span class="cell"><span class="ch">a</span><span class="ix">2</span></span><span class="cell"><span class="ch">n</span><span class="ix">3</span></span><span class="cell"><span class="ch">k</span><span class="ix">4</span></span><span class="cell"><span class="ch">s</span><span class="ix">5</span></span><span class="cell"><span class="ch">g</span><span class="ix">6</span></span><span class="cell"><span class="ch">i</span><span class="ix">7</span></span><span class="cell"><span class="ch">v</span><span class="ix">8</span></span><span class="cell"><span class="ch">i</span><span class="ix">9</span></span><span class="cell"><span class="ch">n</span><span class="ix">10</span></span><span class="cell"><span class="ch">g</span><span class="ix">11</span></span></div><ol><li><code>s.length()</code></li><li><code>s.substring(0, 5)</code></li><li><code>s.substring(6)</code></li><li><code>s.indexOf("g")</code></li><li><code>s.indexOf("ing")</code></li><li><code>s.indexOf("turkey")</code></li><li><code>s.substring(5, 6)</code></li><li><code>s.substring(s.length() - 3)</code></li><li><code>"pie".compareTo("pumpkin") &lt; 0</code></li><li><code>s.substring(2, 2)</code></li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li>12</li><li>"thank"</li><li>"giving"</li><li>6</li><li>9</li><li>−1</li><li>"s"</li><li>"ing"</li><li>true. “i” comes before “u”.</li><li>"" (an empty String)</li></ol></div></details></div><div class="prob"><div class="q"><span class="tag">D3.2</span><div>Which of these crash? Say why.<ol><li><code>s.substring(0, s.length())</code></li><li><code>s.substring(s.length())</code></li><li><code>s.substring(s.length() + 1)</code></li><li><code>for (int i = 0; i &lt; s.length(); i++) { String two = s.substring(i, i + 2); }</code></li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><p>1 and 2 are fine: they give the whole String and "". 3 crashes: it starts past the end. 4 crashes on the last pass: at i = 11 it asks for <code>substring(11, 13)</code>, but the length is 12.</p></div></details></div><div class="prob"><div class="q"><span class="tag">D3.3</span><div>Write <code>public int countLetter(String word, String letter)</code>. It returns how many times the one-letter String letter appears in word. <code>countLetter("banana", "a")</code> returns 3.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">countLetter</span>(<span class="tok-k">String</span> word, <span class="tok-k">String</span> letter)
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt; word.<span class="tok-m">length</span>(); i++)
+    {
+        <span class="tok-k">if</span> (word.<span class="tok-m">substring</span>(i, i + <span class="tok-n">1</span>).<span class="tok-m">equals</span>(letter))
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count;
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D3.4</span><div>Write <code>public String firstName(String full)</code>. full is always “Last, First”, for example <code>"Lopez, Maria"</code>, which returns <code>"Maria"</code>. Use indexOf.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">String</span> <span class="tok-m">firstName</span>(<span class="tok-k">String</span> full)
+{
+    <span class="tok-k">int</span> comma = full.<span class="tok-m">indexOf</span>(<span class="tok-s">", "</span>);
+    <span class="tok-k">return</span> full.<span class="tok-m">substring</span>(comma + <span class="tok-n">2</span>);    <span class="tok-c">// + 2 skips the comma and the space</span>
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D3.5</span><div>Write <code>public boolean hasPair(String word)</code>. It returns true if word has two of the same letter next to each other. Return as soon as you find one.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">hasPair</span>(<span class="tok-k">String</span> word)
+{
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt; word.<span class="tok-m">length</span>() - <span class="tok-n">1</span>; i++)
+    {
+        <span class="tok-k">if</span> (word.<span class="tok-m">substring</span>(i, i + <span class="tok-n">1</span>).<span class="tok-m">equals</span>(word.<span class="tok-m">substring</span>(i + <span class="tok-n">1</span>, i + <span class="tok-n">2</span>)))
+        {
+            <span class="tok-k">return</span> <span class="tok-k">true</span>;
+        }
+    }
+    <span class="tok-k">return</span> <span class="tok-k">false</span>;
+}</code></pre></div></details></div></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>2021 FRQ 1 WordMatch</h2><p>Do both parts, about 25 minutes. Part (a) uses loop shape 2 above. Part (b) calls your part (a) method twice, with no dot, and uses compareTo.</p><div class="links"><a href="https://apcentral.collegeboard.org/media/pdf/ap21-frq-computer-science-a.pdf" target="_blank" rel="noopener">Official 2021 questions (PDF), question 1</a></div><details class="ans"><summary>Show key ideas</summary><div class="ans-body"><p>(a) Loop i from 0 to <code>secret.length() - guess.length()</code>, count the times <code>secret.substring(i, i + guess.length()).equals(guess)</code>, then return <code>count * guess.length() * guess.length()</code>.</p><p>(b) Call <code>scoreGuess(guess1)</code> and <code>scoreGuess(guess2)</code>. Return the guess with the higher score. On a tie, return the one whose compareTo is greater than 0.</p></div></details></section><section class="card exit"><h2>Exit ticket</h2><p>Write <code>public String initials(String first, String last)</code>. <code>initials("Maria", "Lopez")</code> returns <code>"ML"</code>.</p><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">String</span> <span class="tok-m">initials</span>(<span class="tok-k">String</span> first, <span class="tok-k">String</span> last)
+{
+    <span class="tok-k">return</span> first.<span class="tok-m">substring</span>(<span class="tok-n">0</span>, <span class="tok-n">1</span>) + last.<span class="tok-m">substring</span>(<span class="tok-n">0</span>, <span class="tok-n">1</span>);
+}</code></pre></div></details></section><button class="mark" data-day="3" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="lbl">Mark Day 3 done</span></button><div class="nav"><button data-go="d2">← Day 2</button><button class="primary" data-go="d4">Day 4 →</button></div></section>
+<section class="panel" id="p-d4" role="tabpanel" aria-labelledby="tab-d4" hidden><h2 class="ph">Day 4: Math.random</h2><p class="goal"><b>Today’s goal:</b> write any random range from memory, and turn a percent chance into an if. Random numbers were the whole of the 2024 FRQ 1.</p><div class="review"><span class="rv-h">Review in your slides</span><p>Unit 1 deck: slides 48 (the Math methods), 49 (a random number in a range), 50 (int or double), 17–19 (casting and rounding).</p></div><section class="card"><h2>Key rules</h2><p><code>Math.random()</code> gives a double from 0.0 up to, but <b>never</b> reaching, 1.0.</p><p><b>The recipe for a whole number from low to high, both included:</b></p><pre class="java"><code><span class="tok-k">int</span> howMany = high - low + <span class="tok-n">1</span>;
+<span class="tok-k">int</span> r = (<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * howMany) + low;</code></pre><div class="tw"><table><thead><tr><th>You want</th><th>Expression</th><th>Smallest</th><th>Largest</th></tr></thead><tbody><tr><td>A die, 1 to 6</td><td><code>(int) (Math.random() * 6) + 1</code></td><td>1</td><td>6</td></tr><tr><td>0 to 9</td><td><code>(int) (Math.random() * 10)</code></td><td>0</td><td>9</td></tr><tr><td>10 to 50</td><td><code>(int) (Math.random() * 41) + 10</code></td><td>10</td><td>50</td></tr><tr><td>−5 to 5</td><td><code>(int) (Math.random() * 11) - 5</code></td><td>−5</td><td>5</td></tr></tbody></table></div><p><b>A percent chance is a comparison, not a range:</b></p><div class="tw"><table><thead><tr><th>You want</th><th>Code</th></tr></thead><tbody><tr><td>A coin flip</td><td><code>if (Math.random() &lt; 0.5)</code></td></tr><tr><td>A 30% chance</td><td><code>if (Math.random() &lt; 0.3)</code></td></tr><tr><td>20% A, 30% B, 50% C</td><td><code>double r = Math.random();</code> then <code>if (r &lt; 0.2)</code> A, <code>else if (r &lt; 0.5)</code> B, <code>else</code> C</td></tr></tbody></table></div></section><section class="card mistake"><h2><span class="pill bad">Watch out</span> The four traps</h2><pre class="java"><code>(<span class="tok-k">int</span>) Math.<span class="tok-m">random</span>() * <span class="tok-n">6</span> + <span class="tok-n">1</span>       <span class="tok-c">// ✗ the cast hits Math.random() first, giving 0. Always 1.</span>
+(<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">6</span>)         <span class="tok-c">// ✗ gives 0 to 5. You forgot the + 1.</span>
+(<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">40</span>) + <span class="tok-n">10</span>   <span class="tok-c">// ✗ gives 10 to 49. howMany is 50 - 10 + 1 = 41.</span>
+
+<span class="tok-k">if</span> (Math.<span class="tok-m">random</span>() &lt; <span class="tok-n">0.2</span>) { ... }        <span class="tok-c">// ✗ two separate random numbers,</span>
+<span class="tok-k">else</span> <span class="tok-k">if</span> (Math.<span class="tok-m">random</span>() &lt; <span class="tok-n">0.5</span>) { ... }   <span class="tok-c">//   so the chances come out wrong</span></code></pre><p>For the last trap: when one random event decides several outcomes, make <b>one</b> random number, store it, and compare that variable.</p></section><section class="card"><h2>The four AP question types</h2><ol><li><b>What range?</b> <code>(int) (Math.random() * 8) + 3</code> gives 3 to 10. Smallest: 0 + 3. Largest: 7 + 3.</li><li><b>Write the expression.</b> 5 to 12: howMany is 12 − 5 + 1 = 8, so <code>(int) (Math.random() * 8) + 5</code>.</li><li><b>Simulate inside a method.</b> Make the random value <i>inside</i> the loop, so each pass gets its own:<pre class="java"><code><span class="tok-c">/** Rolls a die until it shows 6. Returns how many rolls it took. */</span>
+<span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">rollsUntilSix</span>()
+{
+    <span class="tok-k">int</span> rolls = <span class="tok-n">0</span>;
+    <span class="tok-k">int</span> roll = <span class="tok-n">0</span>;
+    <span class="tok-k">while</span> (roll != <span class="tok-n">6</span>)
+    {
+        roll = (<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">6</span>) + <span class="tok-n">1</span>;
+        rolls++;
+    }
+    <span class="tok-k">return</span> rolls;
+}</code></pre></li><li><b>Which code gives the right chance?</b> <code>Math.random() &lt; 0.25</code> is true 25% of the time. So is <code>(int) (Math.random() * 4) == 0</code>, because 0 is one of four equally likely values.</li></ol></section><section class="card"><h2>Try it</h2><div class="prob"><div class="q"><span class="tag">D4.1</span><div>Give the smallest and largest value of each.<ol><li><code>(int) (Math.random() * 10) + 1</code></li><li><code>(int) (Math.random() * 5) + 20</code></li><li><code>(int) (Math.random() * 3) - 1</code></li><li><code>(int) (Math.random() * 100)</code></li><li><code>(int) Math.random() * 100</code></li><li><code>(int) (Math.random() * 5) * 2</code></li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li>1 to 10</li><li>20 to 24</li><li>−1 to 1</li><li>0 to 99</li><li>Always 0. The cast happens before the multiply.</li><li>0 to 8, even numbers only</li></ol></div></details></div><div class="prob"><div class="q"><span class="tag">D4.2</span><div>Write an expression for each.<ol><li>A whole number from 1 to 100.</li><li>A whole number from 5 to 12.</li><li>A random <b>even</b> number from 2 to 10.</li><li>A double from 0.0 up to (not including) 5.0.</li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li><code>(int) (Math.random() * 100) + 1</code></li><li><code>(int) (Math.random() * 8) + 5</code></li><li><code>(int) (Math.random() * 5) * 2 + 2</code>, which gives 2, 4, 6, 8 or 10</li><li><code>Math.random() * 5</code></li></ol></div></details></div><div class="prob"><div class="q"><span class="tag">D4.3</span><div>Which of these are true about 25% of the time? There may be more than one.<ol><li><code>Math.random() &lt; 0.25</code></li><li><code>Math.random() &gt; 0.75</code></li><li><code>(int) (Math.random() * 4) == 2</code></li><li><code>Math.random() * 4 &lt; 1</code></li><li><code>(int) (Math.random() * 25) == 1</code></li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><p>1, 2, 3 and 4 are each true 25% of the time. 5 is true only 4% of the time (1 in 25).</p></div></details></div><div class="prob"><div class="q"><span class="tag">D4.4</span><div>Write <code>public int countDoubles(int n)</code>. It rolls two dice n times and returns how many times both dice showed the same number.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">countDoubles</span>(<span class="tok-k">int</span> n)
+{
+    <span class="tok-k">int</span> doubles = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt; n; i++)
+    {
+        <span class="tok-k">int</span> d1 = (<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">6</span>) + <span class="tok-n">1</span>;   <span class="tok-c">// inside the loop: a new roll each time</span>
+        <span class="tok-k">int</span> d2 = (<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">6</span>) + <span class="tok-n">1</span>;
+        <span class="tok-k">if</span> (d1 == d2)
+        {
+            doubles++;
+        }
+    }
+    <span class="tok-k">return</span> doubles;
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D4.5</span><div>Write <code>public String spin()</code>. It returns "Jackpot" 10% of the time, "Small prize" 40% of the time, and "Nothing" 50% of the time. Use one random number.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">String</span> <span class="tok-m">spin</span>()
+{
+    <span class="tok-k">double</span> r = Math.<span class="tok-m">random</span>();     <span class="tok-c">// one random number for the whole decision</span>
+    <span class="tok-k">if</span> (r &lt; <span class="tok-n">0.1</span>)
+    {
+        <span class="tok-k">return</span> <span class="tok-s">"Jackpot"</span>;
+    }
+    <span class="tok-k">else</span> <span class="tok-k">if</span> (r &lt; <span class="tok-n">0.5</span>)             <span class="tok-c">// 0.1 up to 0.5 is 40%</span>
+    {
+        <span class="tok-k">return</span> <span class="tok-s">"Small prize"</span>;
+    }
+    <span class="tok-k">else</span>
+    {
+        <span class="tok-k">return</span> <span class="tok-s">"Nothing"</span>;
+    }
+}</code></pre></div></details></div></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>2024 FRQ 1 Feeder</h2><p>Do both parts, about 25 minutes. Part (a) needs a percent chance <b>and</b> a random range. Part (b) calls your part (a) method in a loop that can stop for two different reasons, a good place for &amp;&amp;.</p><div class="links"><a href="https://apcentral.collegeboard.org/media/pdf/ap24-frq-comp-sci-a.pdf" target="_blank" rel="noopener">Official 2024 questions (PDF), question 1</a><a href="https://apcentral.collegeboard.org/media/pdf/ap24-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2024 Question 1 scoring guidelines</a></div></section><section class="card exit"><h2>Exit ticket</h2><p>Write an expression for a random even number from 2 to 10, without looking at D4.2.</p><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code>(<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">5</span>) * <span class="tok-n">2</span> + <span class="tok-n">2</span></code></pre></div></details></section><button class="mark" data-day="4" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="lbl">Mark Day 4 done</span></button><div class="nav"><button data-go="d3">← Day 3</button><button class="primary" data-go="d5">Day 5 →</button></div></section>
+<section class="panel" id="p-d5" role="tabpanel" aria-labelledby="tab-d5" hidden><h2 class="ph">Day 5: The six FRQ 1 patterns</h2><p class="goal"><b>Today’s goal:</b> read a question and know which pattern it needs before writing a line. Almost every FRQ 1 part is one of these six, or two combined.</p><div class="review"><span class="rv-h">Review in your slides</span><p>Unit 2 deck: slides 38–42 (sum, average, counting, digits, largest so far, with practice), 61 (recap of challenge areas). Your Recovery handout, Rounds 1 and 2 (seasonWinner, bestDay, findSeats).</p></div><section class="card"><h2>The patterns</h2><div class="tw"><table><thead><tr><th>#</th><th>Pattern</th><th>The question says</th><th>Mistake to avoid</th></tr></thead><tbody><tr><td>1</td><td>Count</td><td>“how many…”</td><td>Counter declared inside the loop, so it resets every pass</td></tr><tr><td>2</td><td>Sum and average</td><td>“total…”, “average…”</td><td>int / int drops the decimal. Cast first: <code>(double) total / n</code></td></tr><tr><td>3</td><td>Find the best</td><td>“which order / day / item had the most…”</td><td>One variable doing two jobs. You need the best <b>value</b> and <b>where</b> it was.</td></tr><tr><td>4</td><td>Compare two</td><td>“who won more…”, “which was faster…”</td><td><code>&gt;</code> when fewer minutes means faster</td></tr><tr><td>5</td><td>Streak with reset</td><td>“in a row”, “consecutive”</td><td>Forgetting <code>count = 0</code> when the streak breaks</td></tr><tr><td>6</td><td>Search with early return</td><td>“the first…”, “return −1 if none”</td><td><code>return -1</code> inside the loop, or returning the loop variable after it</td></tr></tbody></table></div></section><section class="card"><h2>The skeletons</h2><div class="skel"><div><h3>1. Count</h3><pre class="java"><code><span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= n; i++)
+{
+    <span class="tok-k">if</span> ( /* condition */ ) { count++; }
+}
+<span class="tok-k">return</span> count;</code></pre></div><div><h3>2. Sum and average</h3><pre class="java"><code><span class="tok-k">int</span> total = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= n; i++)
+{
+    total += /* value <span class="tok-k">for</span> i */;
+}
+<span class="tok-k">return</span> (<span class="tok-k">double</span>) total / n;</code></pre></div><div><h3>3. Find the best</h3><pre class="java"><code><span class="tok-k">int</span> best = <span class="tok-n">1</span>;                      <span class="tok-c">// start from a real item...</span>
+<span class="tok-k">double</span> most = obj.<span class="tok-m">getValue</span>(<span class="tok-n">1</span>);
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">2</span>; i &lt;= n; i++)       <span class="tok-c">// ...then check the rest</span>
+{
+    <span class="tok-k">double</span> v = obj.<span class="tok-m">getValue</span>(i);
+    <span class="tok-k">if</span> (v &gt; most)                  <span class="tok-c">// &gt; keeps the earliest in a tie</span>
+    {
+        most = v;
+        best = i;
+    }
+}
+<span class="tok-k">return</span> best;</code></pre></div><div><h3>4. Compare two</h3><pre class="java"><code><span class="tok-k">int</span> oneWins = <span class="tok-n">0</span>;
+<span class="tok-k">int</span> twoWins = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= n; i++)
+{
+    <span class="tok-k">if</span> (<span class="tok-m">a</span>(i) &lt; <span class="tok-m">b</span>(i)) { oneWins++; }          <span class="tok-c">// pick &lt; or &gt; from the question</span>
+    <span class="tok-k">else</span> <span class="tok-k">if</span> (<span class="tok-m">b</span>(i) &lt; <span class="tok-m">a</span>(i)) { twoWins++; }     <span class="tok-c">// a tie adds to neither</span>
+}
+<span class="tok-c">// after the loop: compare oneWins and twoWins, return the right answer</span></code></pre></div><div><h3>5. Streak with reset</h3><pre class="java"><code><span class="tok-k">int</span> streak = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= n; i++)
+{
+    <span class="tok-k">if</span> ( /* item i is good */ )
+    {
+        streak++;
+        <span class="tok-k">if</span> (streak == need) { <span class="tok-k">return</span> i - need + <span class="tok-n">1</span>; }   <span class="tok-c">// where the streak started</span>
+    }
+    <span class="tok-k">else</span>
+    {
+        streak = <span class="tok-n">0</span>;
+    }
+}
+<span class="tok-k">return</span> -<span class="tok-n">1</span>;</code></pre></div><div><h3>6. Search with early return</h3><pre class="java"><code><span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= n; i++)
+{
+    <span class="tok-k">if</span> ( /* item i is the one */ ) { <span class="tok-k">return</span> i; }
+}
+<span class="tok-k">return</span> -<span class="tok-n">1</span>;              <span class="tok-c">// only after checking everything</span></code></pre></div></div></section><section class="card mistake"><h2><span class="pill bad">Real mistake</span> From the Recovery Check, pattern 3</h2><pre class="java"><code>slowest = i;      <span class="tok-c">// ✗ slowest was compared as a time, then given an order number</span>
+<span class="tok-k">if</span> (i &gt; most)     <span class="tok-c">// ✗ compares the order number, not the time</span>
+<span class="tok-k">return</span> i;         <span class="tok-c">// ✗ after the loop, i no longer exists</span></code></pre></section><section class="card"><h2>Picking the loop bounds</h2><div class="tw"><table><thead><tr><th>Things are numbered</th><th>Loop</th></tr></thead><tbody><tr><td>1 to n (orders, days, games)</td><td><code>for (int i = 1; i &lt;= n; i++)</code></td></tr><tr><td>0 to 59 (minutes)</td><td><code>for (int m = 0; m &lt;= 59; m++)</code></td></tr><tr><td>Characters of a String</td><td><code>for (int i = 0; i &lt; s.length(); i++)</code></td></tr><tr><td>Pieces of length k in a String</td><td><code>for (int i = 0; i &lt;= s.length() - k; i++)</code></td></tr><tr><td>Run exactly num times</td><td><code>for (int i = 0; i &lt; num; i++)</code></td></tr></tbody></table></div><p>Read the precondition. It tells you where the numbering starts and stops.</p></section><section class="card"><h2>Try it</h2><div class="prob"><div class="q"><span class="tag">D5.1</span><div>Name the pattern (1–6).<ol><li>Return the number of days the store sold more than 100 items.</li><li>Return the first hour the parking lot was full, or −1.</li><li>Return the week with the highest rainfall.</li><li>Return true if the runner ran 5 km or more on 3 days in a row.</li><li>Return the mean score over all games.</li><li>Return "Home" if the home team scored more in more games, "Away" if the away team did, or "Tie".</li></ol></div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><ol><li>1 Count</li><li>6 Search with early return</li><li>3 Find the best</li><li>5 Streak with reset</li><li>2 Sum and average</li><li>4 Compare two</li></ol></div></details></div><p>For D5.2 to D5.4, a class has <code>private Player player;</code>. Player has <code>public int getScore(int round)</code>, rounds 1 to 20.</p><div class="prob"><div class="q"><span class="tag">D5.2</span><div>Write <code>public double averageScore(int numRounds)</code>.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">double</span> <span class="tok-m">averageScore</span>(<span class="tok-k">int</span> numRounds)
+{
+    <span class="tok-k">int</span> total = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> r = <span class="tok-n">1</span>; r &lt;= numRounds; r++)
+    {
+        total += player.<span class="tok-m">getScore</span>(r);
+    }
+    <span class="tok-k">return</span> (<span class="tok-k">double</span>) total / numRounds;
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D5.3</span><div>Write <code>public int firstRoundAbove(int limit)</code>. It returns the first round from 1 to 20 with a score above limit, or −1.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">firstRoundAbove</span>(<span class="tok-k">int</span> limit)
+{
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> r = <span class="tok-n">1</span>; r &lt;= <span class="tok-n">20</span>; r++)
+    {
+        <span class="tok-k">if</span> (player.<span class="tok-m">getScore</span>(r) &gt; limit)
+        {
+            <span class="tok-k">return</span> r;
+        }
+    }
+    <span class="tok-k">return</span> -<span class="tok-n">1</span>;
+}</code></pre></div></details></div><div class="prob"><div class="q"><span class="tag">D5.4</span><div>Write <code>public boolean hasHotStreak(int need)</code>. It returns true if the player scored 10 or more in need rounds in a row.</div></div><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">hasHotStreak</span>(<span class="tok-k">int</span> need)
+{
+    <span class="tok-k">int</span> streak = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> r = <span class="tok-n">1</span>; r &lt;= <span class="tok-n">20</span>; r++)
+    {
+        <span class="tok-k">if</span> (player.<span class="tok-m">getScore</span>(r) &gt;= <span class="tok-n">10</span>)
+        {
+            streak++;
+            <span class="tok-k">if</span> (streak == need)
+            {
+                <span class="tok-k">return</span> <span class="tok-k">true</span>;
+            }
+        }
+        <span class="tok-k">else</span>
+        {
+            streak = <span class="tok-n">0</span>;
+        }
+    }
+    <span class="tok-k">return</span> <span class="tok-k">false</span>;
+}</code></pre></div></details></div></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>2023 FRQ 1 AppointmentBook</h2><p>About 25 minutes. Part (a) is pattern 5 with minutes 0 to 59. Part (b) must call your part (a) method.</p><div class="links"><a href="https://apcentral.collegeboard.org/media/pdf/ap23-frq-comp-sci-a.pdf" target="_blank" rel="noopener">Official 2023 questions (PDF), question 1</a><a href="https://apcentral.collegeboard.org/media/pdf/ap23-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2023 Question 1 scoring guidelines and samples</a></div><details class="ans"><summary>Show key ideas</summary><div class="ans-body"><p>(a) D5.4’s shape with <code>isMinuteFree(period, minute)</code> for minutes 0 to 59, returning <code>minute - duration + 1</code> when the streak reaches duration.</p><p>(b) Loop through the periods and call <code>findFreeBlock</code>. When it isn’t −1, call <code>reserveBlock</code> and return true. Return false only after the loop.</p></div></details></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>2022 FRQ 1 Game, part (b)</h2><p>About 10 minutes. Pattern 3. Notice it must call <code>play()</code> before each <code>getScore()</code>.</p><div class="links"><a href="https://runestone.academy/ns/books/published/csawesome2/frq-game-score.html" target="_blank" rel="noopener">Open in CSAwesome</a><a href="https://apcentral.collegeboard.org/media/pdf/ap22-frq-computer-science-a.pdf" target="_blank" rel="noopener">Official 2022 questions (PDF), question 1</a></div><details class="ans"><summary>Show key ideas</summary><div class="ans-body"><p>Call <code>play()</code> then <code>getScore()</code> to get the first score. Loop for the remaining games, calling <code>play()</code> then <code>getScore()</code> each time and keeping the highest. Return the highest after the loop.</p></div></details></section><section class="card exit"><h2>Exit ticket</h2><p>Without looking, write the skeleton for pattern 5 (streak with reset).</p><details class="ans"><summary>Show answer</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">int</span> streak = <span class="tok-n">0</span>;
+<span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">1</span>; i &lt;= n; i++)
+{
+    <span class="tok-k">if</span> ( /* item i is good */ )
+    {
+        streak++;
+        <span class="tok-k">if</span> (streak == need) { <span class="tok-k">return</span> i - need + <span class="tok-n">1</span>; }   <span class="tok-c">// where the streak started</span>
+    }
+    <span class="tok-k">else</span>
+    {
+        streak = <span class="tok-n">0</span>;
+    }
+}
+<span class="tok-k">return</span> -<span class="tok-n">1</span>;</code></pre></div></details></section><button class="mark" data-day="5" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="lbl">Mark Day 5 done</span></button><div class="nav"><button data-go="d4">← Day 4</button><button class="primary" data-go="d6">Day 6 →</button></div></section>
+<section class="panel" id="p-d6" role="tabpanel" aria-labelledby="tab-d6" hidden><h2 class="ph">Day 6: Timed practice and self-scoring</h2><p class="goal"><b>Today’s goal:</b> two full FRQ 1 questions under exam time, scored the way AP readers score them. This is the work you photograph and upload.</p><section class="card"><h2>How FRQ 1 is graded</h2><p>Readers give a point for each piece of correct logic. You do not need perfect code to earn most of the points.</p><div class="two"><div class="good-box"><h3>Usually not penalized</h3><ul><li>A missing semicolon or int when the meaning is clear</li><li><code>=</code> instead of <code>==</code></li><li>Missing ( ) around a condition</li><li>Small spelling or capital-letter slips when it’s clear what you meant</li></ul></div><div class="bad-box"><h3>Costs points</h3><ul><li>Calling a method on the wrong thing, or with the wrong arguments</li><li>Comparing the wrong values, or with < when the question needs ></li><li>Returning the wrong thing, too early, or not at all</li><li>Printing with System.out.println instead of returning</li><li>Not calling a method the question says you <b>must</b> use</li></ul></div></div><div class="tip"><b>Part (b) is graded on its own.</b> Readers assume your part (a) works, even if you left it blank. Always do part (b).</div></section><section class="card"><h2>The exam routine</h2><ol><li>Read the whole question, including every example table. Underline what the method <b>returns</b>.</li><li>Circle the methods you are given and the ones you must use.</li><li>Read the preconditions. Don’t check what they already promise.</li><li>Name the pattern (Day 5). Write 3–4 lines of pseudocode.</li><li>Write the code. Copy object and method names exactly from the class information.</li><li>Trace one example from the question through your code. Fix what doesn’t match.</li><li>Cross out mistakes with one line instead of erasing. Crossed-out work isn’t graded, but it saves time.</li></ol></section><section class="card apq"><span class="apq-h">Real AP question</span><h2>Timed question 1: 2019 FRQ 1 APCalendar (22 minutes)</h2><p>Both parts call helper methods in the same class, with no dot. Set a timer, then score yourself with the official guidelines. Past questions were scored out of 9, so focus on which points you lost, not the total.</p><div class="links"><a href="https://apstudents.collegeboard.org/sites/default/files/2019-05/ap19-frq-computer-science-a.pdf" target="_blank" rel="noopener">Official 2019 questions (PDF), question 1</a><a href="https://runestone.academy/ns/books/published/csawesome2/FRQcalendar.html" target="_blank" rel="noopener">Open in CSAwesome</a><a href="https://apcentral.collegeboard.org/media/pdf/ap19-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2019 Question 1 scoring guidelines</a></div></section><section class="card"><h2>Timed question 2: HikeTracker (22 minutes)</h2><p>A new question, in our class format: part (a) is worth 4 points, part (b) 3 points.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> HikeTracker
+{
+    <span class="tok-k">private</span> Hiker hiker;
+
+    <span class="tok-c">// Hiker has these methods:</span>
+    <span class="tok-c">//   /** Returns the miles hiked on day d. Precondition: 1 &lt;= d &lt;= 30 */</span>
+    <span class="tok-c">//   public double getMiles(int d)</span>
+    <span class="tok-c">//   /** Returns the name of the trail hiked on day d. Precondition: 1 &lt;= d &lt;= 30 */</span>
+    <span class="tok-c">//   public String getTrail(int d)</span>
+
+    <span class="tok-c">/** Returns the length of the longest run of days in a row, from day 1 to</span>
+<span class="tok-c">     *  day numDays, on which the hiker hiked at least goal miles.</span>
+<span class="tok-c">     *  Precondition: 1 &lt;= numDays &lt;= 30 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">longestRun</span>(<span class="tok-k">int</span> numDays, <span class="tok-k">double</span> goal)
+    { /* to be implemented in part (a) */ }
+
+    <span class="tok-c">/** Returns true if the hiker met the challenge in days 1 to numDays,</span>
+<span class="tok-c">     *  as described in part (b). Precondition: 1 &lt;= numDays &lt;= 30 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">metChallenge</span>(<span class="tok-k">int</span> numDays)
+    { /* to be implemented in part (b) */ }
+}</code></pre><p><b>Example data for one hiker:</b></p><div class="tw"><table><thead><tr><th>Day</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr></thead><tbody><tr><td><code>getMiles(d)</code></td><td>6.0</td><td>5.5</td><td>2.0</td><td>5.0</td><td>7.5</td><td>5.2</td><td>3.0</td></tr><tr><td><code>getTrail(d)</code></td><td>"Lake Loop"</td><td>"River Trail"</td><td>"Eagle Peak"</td><td>"Lake Loop"</td><td>"Ridge Run"</td><td>"River Trail"</td><td>"Lake Loop"</td></tr></tbody></table></div><p><b>(a)</b> Write <code>longestRun</code>. With the data above, <code>longestRun(7, 5.0)</code> returns 3 (days 4, 5 and 6). <code>longestRun(7, 6.0)</code> returns 1. <code>longestRun(2, 8.0)</code> returns 0.</p><p><b>(b)</b> Write <code>metChallenge</code>. The challenge is met if <b>either</b> the longest run of days with at least 5.0 miles is 3 or more, <b>or</b> the hiker hiked a trail whose name contains "Peak" on any of days 1 to numDays. You must call <code>longestRun</code> appropriately to receive full credit. With the data above, <code>metChallenge(7)</code> returns true, and <code>metChallenge(2)</code> returns false.</p><details class="ans"><summary>Show part (a) solution and rubric</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">longestRun</span>(<span class="tok-k">int</span> numDays, <span class="tok-k">double</span> goal)
+{
+    <span class="tok-k">int</span> run = <span class="tok-n">0</span>;
+    <span class="tok-k">int</span> longest = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> d = <span class="tok-n">1</span>; d &lt;= numDays; d++)
+    {
+        <span class="tok-k">if</span> (hiker.<span class="tok-m">getMiles</span>(d) &gt;= goal)
+        {
+            run++;
+            <span class="tok-k">if</span> (run &gt; longest)
+            {
+                longest = run;
+            }
+        }
+        <span class="tok-k">else</span>
+        {
+            run = <span class="tok-n">0</span>;
+        }
+    }
+    <span class="tok-k">return</span> longest;
+}</code></pre><div class="tw"><table><thead><tr><th>Point</th><th>Earned when</th></tr></thead><tbody><tr><td>1</td><td>Loops days 1 to numDays and calls <code>hiker.getMiles(d)</code></td></tr><tr><td>2</td><td>Compares with <code>&gt;= goal</code> and adds 1 to the run when the goal is met</td></tr><tr><td>3</td><td>Resets the run to 0 when the goal is missed</td></tr><tr><td>4</td><td>Keeps the longest run so far and returns it after the loop</td></tr></tbody></table></div><p><b>Watch out:</b> if you only update longest in the else, a run that lasts until the last day never gets counted.</p></div></details><details class="ans"><summary>Show part (b) solution and rubric</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">metChallenge</span>(<span class="tok-k">int</span> numDays)
+{
+    <span class="tok-k">if</span> (<span class="tok-m">longestRun</span>(numDays, <span class="tok-n">5.0</span>) &gt;= <span class="tok-n">3</span>)     <span class="tok-c">// part (a) method: no dot</span>
+    {
+        <span class="tok-k">return</span> <span class="tok-k">true</span>;
+    }
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> d = <span class="tok-n">1</span>; d &lt;= numDays; d++)
+    {
+        <span class="tok-k">if</span> (hiker.<span class="tok-m">getTrail</span>(d).<span class="tok-m">indexOf</span>(<span class="tok-s">"Peak"</span>) &gt;= <span class="tok-n">0</span>)
+        {
+            <span class="tok-k">return</span> <span class="tok-k">true</span>;
+        }
+    }
+    <span class="tok-k">return</span> <span class="tok-k">false</span>;                           <span class="tok-c">// only after checking every day</span>
+}</code></pre><div class="tw"><table><thead><tr><th>Point</th><th>Earned when</th></tr></thead><tbody><tr><td>1</td><td>Calls <code>longestRun(numDays, 5.0)</code> with no dot and checks for 3 or more</td></tr><tr><td>2</td><td>Loops days 1 to numDays and checks <code>hiker.getTrail(d).indexOf("Peak")</code> against −1</td></tr><tr><td>3</td><td>Returns true when either part is met, and false only after everything is checked</td></tr></tbody></table></div><p><b>Common mistakes:</b> <code>hiker.longestRun(...)</code> (longestRun belongs to HikeTracker), <code>getTrail(d).equals("Peak")</code> (the name only <i>contains</i> Peak), and <code>return false</code> inside the loop.</p></div></details></section><section class="card"><h2>Ready for Unit 3?</h2><p>Tick each one you can do <b>without notes</b>. Anything left unticked: go back to that day.</p><div class="checks"><label class="chk"><input type="checkbox" data-k="r0"><span>I can call a method on an object, on my own class (no dot), and on Math.</span></label><label class="chk"><input type="checkbox" data-k="r1"><span>I never give a counter the same name as an object.</span></label><label class="chk"><input type="checkbox" data-k="r2"><span>I put { after the ), never use else with a condition, and close my loop before return.</span></label><label class="chk"><input type="checkbox" data-k="r3"><span>I can write a range like “between 10 and 20” with &amp;&amp;.</span></label><label class="chk"><input type="checkbox" data-k="r4"><span>I know what substring(a, b) gives back, and why it stops before b.</span></label><label class="chk"><input type="checkbox" data-k="r5"><span>I compare Strings with equals.</span></label><label class="chk"><input type="checkbox" data-k="r6"><span>I can write a random whole number from any low to any high from memory.</span></label><label class="chk"><input type="checkbox" data-k="r7"><span>I can turn “a 30% chance” into an if.</span></label><label class="chk"><input type="checkbox" data-k="r8"><span>I can name the six patterns and write each skeleton.</span></label><label class="chk"><input type="checkbox" data-k="r9"><span>I always do part (b), and I call my part (a) method in it when the question allows.</span></label></div><div class="tip"><b>Before the first class after break:</b> upload a photo of your two timed answers and your scored rubrics.</div></section><button class="mark" data-day="6" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="lbl">Mark Day 6 done</span></button><div class="nav"><button data-go="d5">← Day 5</button><button class="primary" data-go="cheat">Cheat sheet →</button></div></section>
+<section class="panel" id="p-cheat" role="tabpanel" aria-labelledby="tab-cheat" hidden><h2 class="ph">Cheat sheet</h2><section class="card"><h2>Calling methods</h2><div class="tw"><table><thead><tr><th>Where it lives</th><th>Call</th></tr></thead><tbody><tr><td>Another object</td><td><code>driverTwo.getDeliveryTime(i)</code></td></tr><tr><td>This class</td><td><code>isMinuteFree(period, m)</code>, no dot</td></tr><tr><td>Math</td><td><code>Math.random()</code>, <code>Math.abs(x)</code></td></tr></tbody></table></div></section><section class="card"><h2>Brackets and conditions</h2><ul><li>Every call has <code>()</code>. Conditions go in <code>()</code>.</li><li><code>{</code> goes after the <code>)</code>. <code>else</code> has no condition.</li><li>No <code>;</code> after <code>for (...)</code> or <code>if (...)</code>. Close the loop before return.</li><li><code>x &gt;= 10 &amp;&amp; x &lt;= 20</code> · <code>x == 3 || x == 5</code> · <code>!(a &amp;&amp; b)</code> is <code>!a || !b</code></li></ul></section><section class="card"><h2>Strings</h2><div class="tw"><table><thead><tr><th>Code</th><th>Gives back</th></tr></thead><tbody><tr><td><code>s.length()</code></td><td>number of characters</td></tr><tr><td><code>s.substring(a, b)</code></td><td>from a up to, not including, b</td></tr><tr><td><code>s.substring(a)</code></td><td>from a to the end</td></tr><tr><td><code>s.substring(i, i + 1)</code></td><td>the one character at i</td></tr><tr><td><code>s.indexOf(str)</code></td><td>first position, or −1</td></tr><tr><td><code>s.equals(t)</code></td><td>true if same text</td></tr><tr><td><code>s.compareTo(t)</code></td><td>negative if s comes first</td></tr></tbody></table></div></section><section class="card"><h2>Random</h2><pre class="java"><code>(<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * (high - low + <span class="tok-n">1</span>)) + low     <span class="tok-c">// whole number, low to high</span>
+<span class="tok-k">if</span> (Math.<span class="tok-m">random</span>() &lt; <span class="tok-n">0.3</span>)                            <span class="tok-c">// 30% chance</span></code></pre></section><section class="card"><h2>The six patterns</h2><ol><li>Count</li><li>Sum and average: <code>(double) total / n</code></li><li>Find the best: the value <b>and</b> where it was</li><li>Compare two: ties add to neither</li><li>Streak with reset: <code>count = 0</code></li><li>Search with early return: <code>return -1</code> after the loop</li></ol></section><section class="card"><h2>Sources</h2><ul><li><a href="https://apcentral.collegeboard.org/courses/ap-computer-science-a/exam/past-exam-questions" target="_blank" rel="noopener">AP Central: past exam questions</a></li><li><a href="https://apcentral.collegeboard.org/media/pdf/ap24-frq-comp-sci-a.pdf" target="_blank" rel="noopener">2024 FRQs</a> · <a href="https://apcentral.collegeboard.org/media/pdf/ap24-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2024 Q1 scoring</a></li><li><a href="https://apcentral.collegeboard.org/media/pdf/ap23-frq-comp-sci-a.pdf" target="_blank" rel="noopener">2023 FRQs</a> · <a href="https://apcentral.collegeboard.org/media/pdf/ap23-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2023 Q1 scoring</a></li><li><a href="https://apcentral.collegeboard.org/media/pdf/ap22-frq-computer-science-a.pdf" target="_blank" rel="noopener">2022 FRQs</a> · <a href="https://runestone.academy/ns/books/published/csawesome2/frq-game-score.html" target="_blank" rel="noopener">CSAwesome Game FRQ</a></li><li><a href="https://apcentral.collegeboard.org/media/pdf/ap21-frq-computer-science-a.pdf" target="_blank" rel="noopener">2021 FRQs</a></li><li><a href="https://apstudents.collegeboard.org/sites/default/files/2019-05/ap19-frq-computer-science-a.pdf" target="_blank" rel="noopener">2019 FRQs</a> · <a href="https://apcentral.collegeboard.org/media/pdf/ap19-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2019 Q1 scoring</a> · <a href="https://runestone.academy/ns/books/published/csawesome2/FRQcalendar.html" target="_blank" rel="noopener">CSAwesome APCalendar FRQ</a></li></ul></section><div class="nav"><button data-go="d6">← Day 6</button><span></span></div></section>
+
+</main>
+<script>
+const KEY = 'tg-frq1-v1';
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { state = {}; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+const tabs = document.querySelectorAll('.tab');
+function show(p, push) {
+  if (!document.getElementById('p-' + p) || !document.querySelector('.tab[data-p="' + p + '"]')) p = 'start';
+  tabs.forEach((t) => {
+    const on = t.dataset.p === p;
+    t.setAttribute('aria-selected', String(on));
+    document.getElementById('p-' + t.dataset.p).hidden = !on;
+  });
+  const bar = document.querySelector('.tabs'), sel = document.querySelector('.tab[data-p="' + p + '"]');
+  if (bar && sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = sel.offsetLeft - bar.offsetLeft - bar.clientWidth / 2 + sel.clientWidth / 2;
+  if (push) {
+    try { history.replaceState(null, '', '#' + p); } catch (e) {}
+    window.scrollTo({ top: 0 });
+  }
+}
+tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.p, true)));
+document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go, true)));
+
+function refresh() {
+  let n = 0;
+  for (let d = 1; d <= 6; d++) {
+    const on = !!state['d' + d];
+    if (on) n++;
+    const tab = document.querySelector('.tab[data-p="d' + d + '"]');
+    if (tab) tab.classList.toggle('done', on);
+    const dc = document.querySelector('.dayc[data-go="d' + d + '"]');
+    if (dc) dc.classList.toggle('done', on);
+    const m = document.querySelector('.mark[data-day="' + d + '"]');
+    if (m) {
+      m.setAttribute('aria-pressed', String(on));
+      m.querySelector('.lbl').textContent = on ? 'Day ' + d + ' done' : 'Mark Day ' + d + ' done';
+    }
+  }
+  document.getElementById('fill').style.width = (n / 6 * 100) + '%';
+  document.getElementById('ptxt').textContent = n === 6 ? 'All 6 days done. Ready for Unit 3!' : n + ' of 6 days done';
+}
+document.querySelectorAll('.mark').forEach((m) => m.addEventListener('click', () => {
+  const k = 'd' + m.dataset.day;
+  state[k] = !state[k];
+  save(); refresh();
+}));
+document.querySelectorAll('.chk input').forEach((c) => {
+  c.checked = !!state[c.dataset.k];
+  c.addEventListener('change', () => { state[c.dataset.k] = c.checked; save(); });
+});
+refresh();
+show(location.hash.slice(1) || 'start', false);
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.addEventListener('load', () => setTimeout(() => window.scrollTo(0, 0), 0));
+
+window.addEventListener('hashchange', () => show(location.hash.slice(1), false));
+</script>
+</body>
+</html>
