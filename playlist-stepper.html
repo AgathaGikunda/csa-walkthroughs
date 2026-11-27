@@ -107,6 +107,31 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
 .hint { color: var(--muted); font-size: 0.85em; }
 @media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
 </style>
+<style id="q-style">
+.qbtn { font: inherit; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; border: 2px solid var(--accent, #2c56c9); background: var(--surface, #fff); color: var(--accent, #2c56c9); }
+.qbtn:hover, .qbtn:focus-visible { background: var(--accent, #2c56c9); color: var(--surface, #fff); outline: none; }
+dialog.qdlg { width: min(940px, 94vw); max-height: 90vh; padding: 0; border: 2px solid var(--rule, #d7dde8); border-radius: 14px; background: var(--surface, #fff); color: var(--ink, #1b2232); font-family: var(--font-text, sans-serif); font-size: 17px; line-height: 1.5; }
+dialog.qdlg::backdrop { background: rgba(10, 14, 24, 0.55); }
+.qdlg .q-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--surface, #fff); border-bottom: 2px solid var(--rule, #d7dde8); z-index: 1; }
+.qdlg .q-head h2 { margin: 0; font-size: 1.15em; }
+.qdlg .q-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.qdlg .q-body h2 { margin: 10px 0 0; font-size: 1.15em; }
+.qdlg .q-body h3 { margin: 8px 0 0; font-size: 1.02em; color: var(--accent, #2c56c9); }
+.qdlg p, .qdlg ul { margin: 0; }
+.qdlg ul { padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+.qdlg code { font-family: var(--font-code, monospace); font-size: 0.88em; background: rgba(127, 140, 170, 0.15); padding: 1px 5px; border-radius: 4px; }
+.qdlg pre.q-java { margin: 0; padding: 12px 14px; border-radius: 10px; background: rgba(127, 140, 170, 0.12); overflow-x: auto; font-size: 0.84em; line-height: 1.45; }
+.qdlg pre.q-java code { background: none; padding: 0; font-size: 1em; }
+.qdlg .q-k { color: var(--kw, #2c56c9); font-weight: 700; } .qdlg .q-s { color: var(--str, #1d7a52); } .qdlg .q-n { color: var(--num, #a24a12); }
+.qdlg .q-m { font-weight: 700; } .qdlg .q-c { color: var(--muted, #5a6478); font-style: italic; }
+.qdlg .q-tw { overflow-x: auto; }
+.qdlg table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.qdlg th, .qdlg td { text-align: left; padding: 6px 9px; border-bottom: 1px solid var(--rule, #d7dde8); vertical-align: top; }
+.qdlg th { color: var(--muted, #5a6478); font-size: 0.86em; }
+.qdlg td code { white-space: nowrap; }
+.qdlg .q-note { background: rgba(226, 180, 60, 0.18); border-left: 4px solid #e2b43c; padding: 8px 12px; border-radius: 8px; }
+</style>
+
 
 <div class="app">
   <header>
@@ -115,6 +140,7 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
       <button class="tab" role="tab" id="tab-a" data-part="a" aria-selected="true">Part (a) songsThatFit</button>
       <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">Part (b) hashtag</button>
     </div>
+    <button class="qbtn" id="qopen" type="button">Full question</button>
     <div class="spacer"></div>
     <span class="counter" id="counter" aria-live="polite"></span>
   </header>
@@ -328,4 +354,51 @@ document.addEventListener("keydown", (e) => {
 function fromHash() { const m = location.hash.match(/^#part-(a|b)$/); setPart(m ? m[1] : "a", true); }
 window.addEventListener("hashchange", fromHash);
 fromHash();
+</script>
+
+<dialog class="qdlg" id="qdlg" aria-labelledby="qdlg-title"><div class="q-head"><h2 id="qdlg-title">FRQ 1 Review: Playlist</h2><button class="qbtn" id="qclose" type="button">Close</button></div><div class="q-body"><p>Question 1: Methods and Control Structures, 7 points. Part (a), 4 points: a loop and conditionals, plus calls to a method of the class. Part (b), 3 points: calling <code>String</code> methods. Time: <b>30 minutes</b>, including the pseudocode.</p><p>Assume that the classes listed in the Java Quick Reference have been imported where appropriate. Unless otherwise noted, assume that parameters in method calls are not null and that methods are called only when their preconditions are satisfied. You may use any of the accessible methods listed in the classes in the question.</p><p>This question involves the <code>Playlist</code> class, which represents a music playlist. The songs in a playlist are numbered starting at 1. You will write two methods of the <code>Playlist</code> class.</p><pre class="q-java"><code><span class="q-k">public</span> <span class="q-k">class</span> Playlist
+{
+    <span class="q-c">/** The playlist's title: words separated by single spaces */</span>
+    <span class="q-k">private</span> <span class="q-k">String</span> title;
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns the length, in seconds, of the song specified by song.</span>
+<span class="q-c">     * The value returned is always greater than 0.</span>
+<span class="q-c">     * Precondition: 1 &lt;= song &lt;= the number of songs in the playlist</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">songLength</span>(<span class="q-k">int</span> song)
+    { <span class="q-c">/* implementation not shown */</span> }
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns the number of songs, starting with song 1 and played in order,</span>
+<span class="q-c">     * that can be played completely within maxSeconds, as described in part (a)</span>
+<span class="q-c">     * Preconditions: numSongs &gt; 0, maxSeconds &gt; 0</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">songsThatFit</span>(<span class="q-k">int</span> numSongs, <span class="q-k">int</span> maxSeconds)
+    { <span class="q-c">/* to be implemented in part (a) */</span> }
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns a hashtag made from the title, as described in part (b)</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">String</span> <span class="q-m">hashtag</span>()
+    { <span class="q-c">/* to be implemented in part (b) */</span> }
+
+    <span class="q-c">// There may be instance variables, constructors, and methods that are not shown.</span>
+}</code></pre><h3>(a) songsThatFit</h3><p>Write the <code>songsThatFit</code> method. The playlist plays songs in order, starting with song 1. The method returns how many songs can be played <b>completely</b> without the total time going over <code>maxSeconds</code>. The method stops at the first song that does not fit, even if a later song is shorter. If every song from 1 to <code>numSongs</code> fits, the method returns <code>numSongs</code>.</p><p>Use the <code>songLength</code> method to find the length of each song. The following table shows the values returned by <code>songLength</code> for a playlist with 5 songs.</p><div class="q-tw"><table><thead><tr><th><code>song</code></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody><tr><td><code>songLength(song)</code></td><td>200</td><td>180</td><td>240</td><td>150</td><td>90</td></tr></tbody></table></div><div class="q-tw"><table><thead><tr><th>Method call</th><th>Return value</th><th>Explanation</th></tr></thead><tbody><tr><td><code>songsThatFit(5, 600)</code></td><td>2</td><td>Songs 1 and 2 take 380 seconds. Adding song 3 makes 620, which is more than 600.</td></tr><tr><td><code>songsThatFit(5, 620)</code></td><td>3</td><td>Songs 1 to 3 take exactly 620 seconds, which is not more than 620. Adding song 4 makes 770.</td></tr><tr><td><code>songsThatFit(5, 1000)</code></td><td>5</td><td>All 5 songs take 860 seconds, which fits.</td></tr><tr><td><code>songsThatFit(5, 150)</code></td><td>0</td><td>Song 1 alone takes 200 seconds, which is more than 150.</td></tr></tbody></table></div><p>Complete method <code>songsThatFit</code>. You must use <code>songLength</code> appropriately to receive full credit.</p><h3>(b) hashtag</h3><p>Write the <code>hashtag</code> method, which returns a new string made of a <code>"#"</code> followed by every character of <code>title</code> except the spaces. The letters keep their order and their capitals. The instance variable <code>title</code> must not be changed.</p><div class="q-tw"><table><thead><tr><th>Value of <code>title</code></th><th>Return value of <code>hashtag()</code></th></tr></thead><tbody><tr><td><code>"Summer Road Trip"</code></td><td><code>"#SummerRoadTrip"</code></td></tr><tr><td><code>"Focus"</code> (one word)</td><td><code>"#Focus"</code></td></tr><tr><td><code>"A B C"</code></td><td><code>"#ABC"</code></td></tr></tbody></table></div><p>You must use <code>String</code> methods appropriately. Useful methods include <code>length()</code>, <code>substring</code>, and <code>equals</code>.</p></div></dialog>
+
+<script id="q-script">
+(function () {
+  var dlg = document.getElementById('qdlg');
+  var openBtn = document.getElementById('qopen');
+  if (!dlg || !openBtn) return;
+  openBtn.addEventListener('click', function () {
+    if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+  });
+  document.getElementById('qclose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) { dlg.close(); } });
+  // While the question is open, arrow keys and Space scroll it instead of moving the walkthrough.
+  window.addEventListener('keydown', function (e) {
+    if (dlg.open && e.key !== 'Escape') { e.stopImmediatePropagation(); }
+  }, true);
+})();
 </script>

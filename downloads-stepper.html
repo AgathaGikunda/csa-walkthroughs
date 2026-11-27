@@ -107,6 +107,31 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
 .hint { color: var(--muted); font-size: 0.85em; }
 @media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
 </style>
+<style id="q-style">
+.qbtn { font: inherit; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; border: 2px solid var(--accent, #2c56c9); background: var(--surface, #fff); color: var(--accent, #2c56c9); }
+.qbtn:hover, .qbtn:focus-visible { background: var(--accent, #2c56c9); color: var(--surface, #fff); outline: none; }
+dialog.qdlg { width: min(940px, 94vw); max-height: 90vh; padding: 0; border: 2px solid var(--rule, #d7dde8); border-radius: 14px; background: var(--surface, #fff); color: var(--ink, #1b2232); font-family: var(--font-text, sans-serif); font-size: 17px; line-height: 1.5; }
+dialog.qdlg::backdrop { background: rgba(10, 14, 24, 0.55); }
+.qdlg .q-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--surface, #fff); border-bottom: 2px solid var(--rule, #d7dde8); z-index: 1; }
+.qdlg .q-head h2 { margin: 0; font-size: 1.15em; }
+.qdlg .q-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.qdlg .q-body h2 { margin: 10px 0 0; font-size: 1.15em; }
+.qdlg .q-body h3 { margin: 8px 0 0; font-size: 1.02em; color: var(--accent, #2c56c9); }
+.qdlg p, .qdlg ul { margin: 0; }
+.qdlg ul { padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+.qdlg code { font-family: var(--font-code, monospace); font-size: 0.88em; background: rgba(127, 140, 170, 0.15); padding: 1px 5px; border-radius: 4px; }
+.qdlg pre.q-java { margin: 0; padding: 12px 14px; border-radius: 10px; background: rgba(127, 140, 170, 0.12); overflow-x: auto; font-size: 0.84em; line-height: 1.45; }
+.qdlg pre.q-java code { background: none; padding: 0; font-size: 1em; }
+.qdlg .q-k { color: var(--kw, #2c56c9); font-weight: 700; } .qdlg .q-s { color: var(--str, #1d7a52); } .qdlg .q-n { color: var(--num, #a24a12); }
+.qdlg .q-m { font-weight: 700; } .qdlg .q-c { color: var(--muted, #5a6478); font-style: italic; }
+.qdlg .q-tw { overflow-x: auto; }
+.qdlg table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.qdlg th, .qdlg td { text-align: left; padding: 6px 9px; border-bottom: 1px solid var(--rule, #d7dde8); vertical-align: top; }
+.qdlg th { color: var(--muted, #5a6478); font-size: 0.86em; }
+.qdlg td code { white-space: nowrap; }
+.qdlg .q-note { background: rgba(226, 180, 60, 0.18); border-left: 4px solid #e2b43c; padding: 8px 12px; border-radius: 8px; }
+</style>
+
 
 <div class="app">
   <header>
@@ -116,6 +141,7 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
       <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">2b Title by artist</button>
     </div>
 
+    <button class="qbtn" id="qopen" type="button">Full question</button>
     <div class="spacer"></div>
     <span class="counter" id="counter" aria-live="polite"></span>
   </header>
@@ -328,4 +354,23 @@ document.addEventListener("keydown", (e) => {
 function fromHash() { const m = location.hash.match(/^#part-(a|b)$/); setPart(m ? m[1] : "a", true); }
 window.addEventListener("hashchange", fromHash);
 fromHash();
+</script>
+
+<dialog class="qdlg" id="qdlg" aria-labelledby="qdlg-title"><div class="q-head"><h2 id="qdlg-title">Song Downloads: question summary</h2><button class="qbtn" id="qclose" type="button">Close</button></div><div class="q-body"><p class="q-note">This is a summary of the question from class: the task and the examples. Use your class handout for the full wording.</p><p>For each part, you write a <b>code segment</b> (no method header) that uses the variables given and prints the intended output. Your code must work for every example in the table, and for any other values that follow the rules. You may use any method in the Java Quick Reference.</p><h3>2a: Ones digit</h3><p><code>downloads</code> is a positive <code>int</code>. Print <code>"exactly once"</code> if the ones digit appears exactly one other time in the number. Otherwise print <code>"not exactly once"</code>.</p><ul><li><code>1734567</code> prints <code>exactly once</code></li><li><code>325322</code> prints <code>not exactly once</code></li></ul><h3>2b: Title by artist</h3><p><code>songInfo</code> holds the artist, the album and the title, separated by two hyphens. Print the song title, then <code>" by "</code>, then the artist name.</p><ul><li><code>"Carrie Ferriero-Greatest Hits-Tell Me Why"</code> prints <code>Tell Me Why by Carrie Ferriero</code></li></ul></div></dialog>
+
+<script id="q-script">
+(function () {
+  var dlg = document.getElementById('qdlg');
+  var openBtn = document.getElementById('qopen');
+  if (!dlg || !openBtn) return;
+  openBtn.addEventListener('click', function () {
+    if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+  });
+  document.getElementById('qclose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) { dlg.close(); } });
+  // While the question is open, arrow keys and Space scroll it instead of moving the walkthrough.
+  window.addEventListener('keydown', function (e) {
+    if (dlg.open && e.key !== 'Escape') { e.stopImmediatePropagation(); }
+  }, true);
+})();
 </script>

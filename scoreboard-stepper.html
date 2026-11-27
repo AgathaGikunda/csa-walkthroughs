@@ -107,6 +107,31 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
 .hint { color: var(--muted); font-size: 0.85em; }
 @media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
 </style>
+<style id="q-style">
+.qbtn { font: inherit; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; border: 2px solid var(--accent, #2c56c9); background: var(--surface, #fff); color: var(--accent, #2c56c9); }
+.qbtn:hover, .qbtn:focus-visible { background: var(--accent, #2c56c9); color: var(--surface, #fff); outline: none; }
+dialog.qdlg { width: min(940px, 94vw); max-height: 90vh; padding: 0; border: 2px solid var(--rule, #d7dde8); border-radius: 14px; background: var(--surface, #fff); color: var(--ink, #1b2232); font-family: var(--font-text, sans-serif); font-size: 17px; line-height: 1.5; }
+dialog.qdlg::backdrop { background: rgba(10, 14, 24, 0.55); }
+.qdlg .q-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--surface, #fff); border-bottom: 2px solid var(--rule, #d7dde8); z-index: 1; }
+.qdlg .q-head h2 { margin: 0; font-size: 1.15em; }
+.qdlg .q-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.qdlg .q-body h2 { margin: 10px 0 0; font-size: 1.15em; }
+.qdlg .q-body h3 { margin: 8px 0 0; font-size: 1.02em; color: var(--accent, #2c56c9); }
+.qdlg p, .qdlg ul { margin: 0; }
+.qdlg ul { padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+.qdlg code { font-family: var(--font-code, monospace); font-size: 0.88em; background: rgba(127, 140, 170, 0.15); padding: 1px 5px; border-radius: 4px; }
+.qdlg pre.q-java { margin: 0; padding: 12px 14px; border-radius: 10px; background: rgba(127, 140, 170, 0.12); overflow-x: auto; font-size: 0.84em; line-height: 1.45; }
+.qdlg pre.q-java code { background: none; padding: 0; font-size: 1em; }
+.qdlg .q-k { color: var(--kw, #2c56c9); font-weight: 700; } .qdlg .q-s { color: var(--str, #1d7a52); } .qdlg .q-n { color: var(--num, #a24a12); }
+.qdlg .q-m { font-weight: 700; } .qdlg .q-c { color: var(--muted, #5a6478); font-style: italic; }
+.qdlg .q-tw { overflow-x: auto; }
+.qdlg table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.qdlg th, .qdlg td { text-align: left; padding: 6px 9px; border-bottom: 1px solid var(--rule, #d7dde8); vertical-align: top; }
+.qdlg th { color: var(--muted, #5a6478); font-size: 0.86em; }
+.qdlg td code { white-space: nowrap; }
+.qdlg .q-note { background: rgba(226, 180, 60, 0.18); border-left: 4px solid #e2b43c; padding: 8px 12px; border-radius: 8px; }
+</style>
+
 
 <div class="app">
   <header>
@@ -115,6 +140,7 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
       <button class="tab" role="tab" id="tab-a" data-part="a" aria-selected="true">Part (a) bestRound</button>
       <button class="tab" role="tab" id="tab-b" data-part="b" aria-selected="false">Part (b) initials</button>
     </div>
+    <button class="qbtn" id="qopen" type="button">Full question</button>
     <div class="spacer"></div>
     <span class="counter" id="counter" aria-live="polite"></span>
   </header>
@@ -328,4 +354,42 @@ document.addEventListener("keydown", (e) => {
 function fromHash() { const m = location.hash.match(/^#part-(a|b)$/); setPart(m ? m[1] : "a", true); }
 window.addEventListener("hashchange", fromHash);
 fromHash();
+</script>
+
+<dialog class="qdlg" id="qdlg" aria-labelledby="qdlg-title"><div class="q-head"><h2 id="qdlg-title">Scoreboard FRQ</h2><button class="qbtn" id="qclose" type="button">Close</button></div><div class="q-body"><p>Question 1: Methods and Control Structures, 7 points (part (a): 4 points, part (b): 3 points).</p><p>Assume that the classes listed in the Java Quick Reference have been imported where appropriate. Unless otherwise noted, assume that parameters in method calls are not null and that methods are called only when their preconditions are satisfied. You may use any of the accessible methods listed in the classes in the question.</p><p>This question involves the <code>Scoreboard</code> class. You will write two methods of the <code>Scoreboard</code> class.</p><pre class="q-java"><code><span class="q-k">public</span> <span class="q-k">class</span> Scoreboard
+{
+    <span class="q-k">private</span> <span class="q-k">int</span> threshold;    <span class="q-c">// a target score</span>
+    <span class="q-k">private</span> <span class="q-k">String</span> teamName;  <span class="q-c">// the team's name, words separated</span>
+                              <span class="q-c">// by single spaces</span>
+
+    <span class="q-c">/** Returns the number of points the team scored in the given</span>
+<span class="q-c">     *  round.  Precondition: 1 &lt;= round &lt;= number of rounds */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">scoreInRound</span>(<span class="q-k">int</span> round) { <span class="q-c">/* implementation not shown */</span> }
+
+    <span class="q-c">/** Returns the number of the round, from 1 to numRounds, with the</span>
+<span class="q-c">     *  highest score, as described in part (a) */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">bestRound</span>(<span class="q-k">int</span> numRounds) { <span class="q-c">/* part (a) */</span> }
+
+    <span class="q-c">/** Returns the team's initials, as described in part (b) */</span>
+    <span class="q-k">public</span> <span class="q-k">String</span> <span class="q-m">initials</span>() { <span class="q-c">/* part (b) */</span> }
+
+    <span class="q-c">// There may be instance variables, constructors, or methods</span>
+    <span class="q-c">// that are not shown.</span>
+}</code></pre><h3>(a) bestRound</h3><p>Write the <code>bestRound</code> method, which returns the number of the round (from 1 to <code>numRounds</code>) in which the team scored the most points, using the <code>scoreInRound</code> method. If two or more rounds are tied for the highest score, return the <b>earliest</b> such round.</p><ul><li>If the scores for rounds 1–5 are 12, 30, 30, 8, and 19, then <code>bestRound(5)</code> returns <b>2</b> (round 2 ties round 3 for the highest score, and round 2 is earlier).</li><li>If <code>numRounds</code> is 1, then <code>bestRound(1)</code> returns <b>1</b>.</li></ul><p>Complete the <code>bestRound</code> method.</p><h3>(b) initials</h3><p>Write the <code>initials</code> method, which returns a new string made of the first letter of each word in <code>teamName</code>. The words in <code>teamName</code> are separated by single spaces.</p><ul><li>If <code>teamName</code> is <code>"Red River Hawks"</code>, then <code>initials()</code> returns <code>"RRH"</code>.</li><li>If <code>teamName</code> is <code>"Falcons"</code>, then <code>initials()</code> returns <code>"F"</code>.</li></ul><p>Complete the <code>initials</code> method.</p></div></dialog>
+
+<script id="q-script">
+(function () {
+  var dlg = document.getElementById('qdlg');
+  var openBtn = document.getElementById('qopen');
+  if (!dlg || !openBtn) return;
+  openBtn.addEventListener('click', function () {
+    if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+  });
+  document.getElementById('qclose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) { dlg.close(); } });
+  // While the question is open, arrow keys and Space scroll it instead of moving the walkthrough.
+  window.addEventListener('keydown', function (e) {
+    if (dlg.open && e.key !== 'Escape') { e.stopImmediatePropagation(); }
+  }, true);
+})();
 </script>

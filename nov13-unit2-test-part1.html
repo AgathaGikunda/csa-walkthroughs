@@ -111,6 +111,31 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
 .hint { color: var(--muted); font-size: 0.85em; }
 @media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
 </style>
+<style id="q-style">
+.qbtn { font: inherit; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; border: 2px solid var(--accent, #2c56c9); background: var(--surface, #fff); color: var(--accent, #2c56c9); }
+.qbtn:hover, .qbtn:focus-visible { background: var(--accent, #2c56c9); color: var(--surface, #fff); outline: none; }
+dialog.qdlg { width: min(940px, 94vw); max-height: 90vh; padding: 0; border: 2px solid var(--rule, #d7dde8); border-radius: 14px; background: var(--surface, #fff); color: var(--ink, #1b2232); font-family: var(--font-text, sans-serif); font-size: 17px; line-height: 1.5; }
+dialog.qdlg::backdrop { background: rgba(10, 14, 24, 0.55); }
+.qdlg .q-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--surface, #fff); border-bottom: 2px solid var(--rule, #d7dde8); z-index: 1; }
+.qdlg .q-head h2 { margin: 0; font-size: 1.15em; }
+.qdlg .q-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.qdlg .q-body h2 { margin: 10px 0 0; font-size: 1.15em; }
+.qdlg .q-body h3 { margin: 8px 0 0; font-size: 1.02em; color: var(--accent, #2c56c9); }
+.qdlg p, .qdlg ul { margin: 0; }
+.qdlg ul { padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+.qdlg code { font-family: var(--font-code, monospace); font-size: 0.88em; background: rgba(127, 140, 170, 0.15); padding: 1px 5px; border-radius: 4px; }
+.qdlg pre.q-java { margin: 0; padding: 12px 14px; border-radius: 10px; background: rgba(127, 140, 170, 0.12); overflow-x: auto; font-size: 0.84em; line-height: 1.45; }
+.qdlg pre.q-java code { background: none; padding: 0; font-size: 1em; }
+.qdlg .q-k { color: var(--kw, #2c56c9); font-weight: 700; } .qdlg .q-s { color: var(--str, #1d7a52); } .qdlg .q-n { color: var(--num, #a24a12); }
+.qdlg .q-m { font-weight: 700; } .qdlg .q-c { color: var(--muted, #5a6478); font-style: italic; }
+.qdlg .q-tw { overflow-x: auto; }
+.qdlg table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.qdlg th, .qdlg td { text-align: left; padding: 6px 9px; border-bottom: 1px solid var(--rule, #d7dde8); vertical-align: top; }
+.qdlg th { color: var(--muted, #5a6478); font-size: 0.86em; }
+.qdlg td code { white-space: nowrap; }
+.qdlg .q-note { background: rgba(226, 180, 60, 0.18); border-left: 4px solid #e2b43c; padding: 8px 12px; border-radius: 8px; }
+</style>
+
 </head>
 <body>
 
@@ -124,6 +149,7 @@ header h1 { font-size: 1.35em; margin: 0; text-wrap: balance; }
       <button class="tab" role="tab" id="tab-2b" data-part="2b" aria-selected="false">2b bookRoom</button>
     </div>
 
+    <button class="qbtn" id="qopen" type="button">Full question</button>
     <div class="spacer"></div>
     <span class="counter" id="counter" aria-live="polite"></span>
   </header>
@@ -434,6 +460,101 @@ document.addEventListener("keydown", (e) => {
 function fromHash() { const m = location.hash.match(/^#part-(1a|1b|2a|2b)$/); setPart(m ? m[1] : "1a", true); }
 window.addEventListener("hashchange", fromHash);
 fromHash();
+</script>
+
+<dialog class="qdlg" id="qdlg" aria-labelledby="qdlg-title"><div class="q-head"><h2 id="qdlg-title">FRQ Test: Runner Race and Study Rooms</h2><button class="qbtn" id="qclose" type="button">Close</button></div><div class="q-body"><p><b>Two questions, 14 points, 60 minutes</b>, including the pseudocode. Each question: part (a) 4 points, part (b) 3 points.</p><p>Assume that the classes listed in the Java Quick Reference have been imported where appropriate. Unless otherwise noted, assume that parameters in method calls are not null and that methods are called only when their preconditions are satisfied. You may use any of the accessible methods listed in the classes in the question.</p><h2>Question 1: Runner Race</h2><p>This question involves the <code>Runner</code> and <code>SimulateRunnerRace</code> classes, which are used to simulate a race between two runners. Each race consists of one or more laps around a track, starting with lap 1. The <code>Runner</code> class contains a helper method, <code>getLapTime</code>. You will write two methods in the <code>SimulateRunnerRace</code> class.</p><pre class="q-java"><code><span class="q-k">public</span> <span class="q-k">class</span> Runner
+{
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns the number of seconds it takes the runner</span>
+<span class="q-c">     * to complete the lap specified by the parameter</span>
+<span class="q-c">     * Precondition: lapNum &gt;= 1</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">double</span> <span class="q-m">getLapTime</span>(<span class="q-k">int</span> lapNum)
+    { <span class="q-c">/* implementation not shown */</span> }
+
+    /* There may be instance variables, constructors,
+       and methods that are not shown. */
+}</code></pre><pre class="q-java"><code><span class="q-k">public</span> <span class="q-k">class</span> SimulateRunnerRace
+{
+    <span class="q-k">private</span> Runner runnerOne;
+    <span class="q-k">private</span> Runner runnerTwo;
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Compares the two runners lap by lap for numLaps laps and returns</span>
+<span class="q-c">     * a String indicating the outcome, as described in part (a)</span>
+<span class="q-c">     * Precondition: numLaps &gt; 0</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">String</span> <span class="q-m">lapWinner</span>(<span class="q-k">int</span> numLaps)
+    { <span class="q-c">/* to be implemented in part (a) */</span> }
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns the lap number, from 1 to numLaps, in which runnerOne</span>
+<span class="q-c">     * had the fastest lap time, as described in part (b)</span>
+<span class="q-c">     * Precondition: numLaps &gt; 0</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">fastestLap</span>(<span class="q-k">int</span> numLaps)
+    { <span class="q-c">/* to be implemented in part (b) */</span> }
+
+    /* There may be instance variables, constructors, and methods
+       that are not shown. */
+}</code></pre><p>The examples in both parts use these lap times, in seconds:</p><div class="q-tw"><table><thead><tr><th>Lap</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody><tr><td><code>runnerOne.getLapTime(lap)</code></td><td>62.5</td><td>60.0</td><td>61.0</td><td>60.0</td></tr><tr><td><code>runnerTwo.getLapTime(lap)</code></td><td>61.0</td><td>60.0</td><td>62.0</td><td>60.5</td></tr></tbody></table></div><h3>(a) lapWinner</h3><p>Write the <code>lapWinner</code> method, which compares the two runners <b>lap by lap</b> for laps 1 through <code>numLaps</code>. A runner wins a lap by completing it in fewer seconds than the other runner. If both runners have the same time for a lap, neither runner wins that lap.</p><p>The <code>lapWinner</code> method returns a <code>String</code> indicating the outcome of the race, according to the following rules.</p><ul><li><code>"Runner 1 wins!"</code> is returned if <code>runnerOne</code> wins more laps than <code>runnerTwo</code>.</li><li><code>"Runner 2 wins!"</code> is returned if <code>runnerTwo</code> wins more laps than <code>runnerOne</code>.</li><li><code>"Tie!"</code> is returned if both runners win the same number of laps.</li></ul><div class="q-tw"><table><thead><tr><th>Method call</th><th>Laps won by <code>runnerOne</code></th><th>Laps won by <code>runnerTwo</code></th><th>Return value</th></tr></thead><tbody><tr><td><code>lapWinner(1)</code></td><td>0</td><td>1 (lap 1)</td><td><code>"Runner 2 wins!"</code></td></tr><tr><td><code>lapWinner(2)</code></td><td>0</td><td>1 (lap 1; lap 2 is the same time)</td><td><code>"Runner 2 wins!"</code></td></tr><tr><td><code>lapWinner(3)</code></td><td>1 (lap 3)</td><td>1 (lap 1)</td><td><code>"Tie!"</code></td></tr><tr><td><code>lapWinner(4)</code></td><td>2 (laps 3 and 4)</td><td>1 (lap 1)</td><td><code>"Runner 1 wins!"</code></td></tr></tbody></table></div><p>Complete method <code>lapWinner</code>. You must use <code>getLapTime</code> appropriately to receive full credit.</p><h3>(b) fastestLap</h3><p>Write the <code>fastestLap</code> method, which returns the number of the lap, from 1 to <code>numLaps</code>, in which <code>runnerOne</code> had the <b>fastest</b> lap time (the fewest seconds). If two or more laps are tied for the fastest time, return the <b>earliest</b> such lap.</p><div class="q-tw"><table><thead><tr><th>Method call</th><th>Lap times checked for <code>runnerOne</code></th><th>Return value</th><th>Explanation</th></tr></thead><tbody><tr><td><code>fastestLap(1)</code></td><td>62.5</td><td>1</td><td>Only lap 1 is checked.</td></tr><tr><td><code>fastestLap(3)</code></td><td>62.5, 60.0, 61.0</td><td>2</td><td>60.0 is the fastest time.</td></tr><tr><td><code>fastestLap(4)</code></td><td>62.5, 60.0, 61.0, 60.0</td><td>2</td><td>Laps 2 and 4 are tied at 60.0, and lap 2 is earlier.</td></tr></tbody></table></div><p>Complete method <code>fastestLap</code>. You must use <code>getLapTime</code> appropriately to receive full credit.</p><h2>Question 2: Study Rooms</h2><p>This question involves the <code>StudyRooms</code> class, which lets students book library study rooms. The rooms are numbered starting at 1. Each room can be booked during a school day that is divided into <b>12 time slots, numbered 0 through 11</b>. A booking uses one or more <b>consecutive</b> free time slots in the same room. You will write two methods of the <code>StudyRooms</code> class.</p><pre class="q-java"><code><span class="q-k">public</span> <span class="q-k">class</span> StudyRooms
+{
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns true if the time slot specified by slot in the room</span>
+<span class="q-c">     * specified by room is free, and false otherwise</span>
+<span class="q-c">     * Preconditions: room is a valid room number</span>
+<span class="q-c">     *                0 &lt;= slot &lt;= 11</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">boolean</span> <span class="q-m">isSlotFree</span>(<span class="q-k">int</span> room, <span class="q-k">int</span> slot)
+    { <span class="q-c">/* implementation not shown */</span> }
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Marks numSlots consecutive time slots in room as booked,</span>
+<span class="q-c">     * starting at startSlot</span>
+<span class="q-c">     * Preconditions: room is a valid room number</span>
+<span class="q-c">     *                0 &lt;= startSlot &lt;= 11, numSlots &gt; 0</span>
+<span class="q-c">     *                All of those slots are free.</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">void</span> <span class="q-m">reserveSlots</span>(<span class="q-k">int</span> room, <span class="q-k">int</span> startSlot, <span class="q-k">int</span> numSlots)
+    { <span class="q-c">/* implementation not shown */</span> }
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Returns the first slot of the earliest block of numSlots consecutive</span>
+<span class="q-c">     * free slots in room, or -1 if there is no such block, as described in part (a)</span>
+<span class="q-c">     * Preconditions: room is a valid room number</span>
+<span class="q-c">     *                1 &lt;= numSlots &lt;= 12</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">findFreeBlock</span>(<span class="q-k">int</span> room, <span class="q-k">int</span> numSlots)
+    { <span class="q-c">/* to be implemented in part (a) */</span> }
+
+    <span class="q-c">/**</span>
+<span class="q-c">     * Books the first room from firstRoom to lastRoom that has a block of</span>
+<span class="q-c">     * numSlots consecutive free slots, and returns that room number,</span>
+<span class="q-c">     * or -1 if no room is booked, as described in part (b)</span>
+<span class="q-c">     * Preconditions: firstRoom &lt;= lastRoom, both valid room numbers</span>
+<span class="q-c">     *                1 &lt;= numSlots &lt;= 12</span>
+<span class="q-c">     */</span>
+    <span class="q-k">public</span> <span class="q-k">int</span> <span class="q-m">bookRoom</span>(<span class="q-k">int</span> firstRoom, <span class="q-k">int</span> lastRoom, <span class="q-k">int</span> numSlots)
+    { <span class="q-c">/* to be implemented in part (b) */</span> }
+
+    <span class="q-c">// There may be instance variables, constructors, and methods that are not shown.</span>
+}</code></pre><p>The examples in both parts use these three rooms. <b>F</b> means the slot is free; <b>X</b> means it is already booked.</p><div class="q-tw"><table><thead><tr><th>Room</th><th>Slot 0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th></tr></thead><tbody><tr><td>1</td><td>X</td><td>F</td><td>F</td><td>X</td><td>F</td><td>X</td><td>F</td><td>F</td><td>X</td><td>F</td><td>X</td><td>F</td></tr><tr><td>2</td><td>X</td><td>F</td><td>F</td><td>X</td><td>F</td><td>F</td><td>F</td><td>X</td><td>X</td><td>F</td><td>F</td><td>F</td></tr><tr><td>3</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td></tr></tbody></table></div><h3>(a) findFreeBlock</h3><p>Write the <code>findFreeBlock</code> method, which looks for a block of <code>numSlots</code> consecutive free time slots in <code>room</code>. The method returns the number of the <b>first slot</b> of the <b>earliest</b> such block. If there is no such block, the method returns -1. The method does not book anything. Use <code>isSlotFree</code> to check each slot.</p><div class="q-tw"><table><thead><tr><th>Method call</th><th>Return value</th><th>Explanation</th></tr></thead><tbody><tr><td><code>findFreeBlock(2, 1)</code></td><td>1</td><td>Slot 1 is the first free slot in room 2.</td></tr><tr><td><code>findFreeBlock(2, 2)</code></td><td>1</td><td>Slots 1 and 2 are free.</td></tr><tr><td><code>findFreeBlock(2, 3)</code></td><td>4</td><td>The first free block, slots 1 and 2, is only 2 slots long, so it is too short. The next free block is slots 4, 5 and 6: 3 free slots in a row. The method returns 4, the first slot of that block.</td></tr><tr><td><code>findFreeBlock(2, 4)</code></td><td>-1</td><td>Room 2 never has 4 free slots in a row.</td></tr><tr><td><code>findFreeBlock(1, 3)</code></td><td>-1</td><td>Room 1 never has 3 free slots in a row.</td></tr></tbody></table></div><p>Complete method <code>findFreeBlock</code>. You must use <code>isSlotFree</code> appropriately to receive full credit.</p><h3>(b) bookRoom</h3><p>Write the <code>bookRoom</code> method, which checks the rooms in order from <code>firstRoom</code> to <code>lastRoom</code>, inclusive. In the first room that has a block of <code>numSlots</code> consecutive free slots, the method books the earliest such block and returns that room number. Only one room is booked. If no room from <code>firstRoom</code> to <code>lastRoom</code> has such a block, nothing is booked and the method returns -1.</p><p>The following calls each start from the room table above.</p><div class="q-tw"><table><thead><tr><th>Method call</th><th>Return value</th><th>What is booked</th></tr></thead><tbody><tr><td><code>bookRoom(1, 3, 2)</code></td><td>1</td><td>Room 1, slots 1 and 2</td></tr><tr><td><code>bookRoom(1, 3, 3)</code></td><td>2</td><td>Room 2, slots 4, 5 and 6 (room 1 has no block of 3)</td></tr><tr><td><code>bookRoom(1, 3, 4)</code></td><td>3</td><td>Room 3, slots 0, 1, 2 and 3</td></tr><tr><td><code>bookRoom(1, 2, 4)</code></td><td>-1</td><td>Nothing: rooms 1 and 2 have no block of 4</td></tr></tbody></table></div><p>Assume that <code>findFreeBlock</code> works as specified, regardless of what you wrote in part (a). You must use <code>findFreeBlock</code> and <code>reserveSlots</code> appropriately to receive full credit.</p></div></dialog>
+
+<script id="q-script">
+(function () {
+  var dlg = document.getElementById('qdlg');
+  var openBtn = document.getElementById('qopen');
+  if (!dlg || !openBtn) return;
+  openBtn.addEventListener('click', function () {
+    if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+  });
+  document.getElementById('qclose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) { dlg.close(); } });
+  // While the question is open, arrow keys and Space scroll it instead of moving the walkthrough.
+  window.addEventListener('keydown', function (e) {
+    if (dlg.open && e.key !== 'Escape') { e.stopImmediatePropagation(); }
+  }, true);
+})();
 </script>
 </body>
 </html>

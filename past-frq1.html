@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Past AP FRQ 1 Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #eef1f6; --surface: #ffffff; --ink: #1b2232; --muted: #5a6478; --rule: #d7dde8; --accent: #2c56c9;
+  --code-bg: #f4f6fb; --method: #8a3fb8; --str: #1d7a52; --num: #b5531c; --comment: #6b7487;
+  --good: #1d7a52; --good-bg: #e3f4ec; --bad: #b53a2a; --bad-bg: #fbe9e6; --tip-bg: #fff4d6; --tip-rule: #e2b43c;
+  --font-text: "Atkinson Hyperlegible", "Segoe UI", Verdana, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10141d; --surface: #181e2b; --ink: #e8ecf4; --muted: #9ba6ba; --rule: #2a3245; --accent: #8eaeff;
+    --code-bg: #121826; --method: #d29bf5; --str: #7fd6a8; --num: #f3a66f; --comment: #8590a6;
+    --good: #7fd6a8; --good-bg: #16302a; --bad: #f29b8c; --bad-bg: #3a1f1c; --tip-bg: #33290f; --tip-rule: #b8902a;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-text); font-size: 18px; line-height: 1.5;
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+}
+main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+a { color: var(--accent); }
+a.home { font-weight: 700; text-decoration: none; }
+h1 { margin: 0; font-size: 1.8em; line-height: 1.2; text-wrap: balance; }
+h2 { margin: 0; font-size: 1.25em; }
+h3 { margin: 0; font-size: 1em; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 6px; }
+.lead { color: var(--muted); }
+
+.progress { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.progress .track { flex: 1; min-width: 160px; height: 12px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+.progress .fill { height: 100%; width: 0; background: var(--good); border-radius: 999px; transition: width 0.3s ease; }
+.progress .ptxt { font-weight: 700; color: var(--muted); font-size: 0.92em; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 2px solid var(--rule); position: sticky; top: 0; background: var(--bg); z-index: 5; padding-top: 6px; }
+.tab {
+  font: inherit; font-weight: 700; font-size: 0.95em; padding: 8px 14px; border: 2px solid transparent; border-bottom: none;
+  border-radius: 10px 10px 0 0; background: none; color: var(--muted); cursor: pointer; margin-bottom: -2px; display: inline-flex; align-items: center; gap: 6px;
+}
+.tab[aria-selected="true"] { background: var(--surface); color: var(--accent); border-color: var(--rule); border-bottom: 2px solid var(--surface); }
+.tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.tab .tick { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); }
+.tab.done .tick { background: var(--good); }
+
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.panel[hidden] { display: none; }
+.ph { font-size: 1.45em; }
+.goal { background: var(--surface); border-left: 5px solid var(--accent); border-radius: 10px; padding: 12px 16px; }
+.review { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+.rv-h { font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8em; }
+.card { background: var(--surface); border: 2px solid var(--rule); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card.mistake { border-color: color-mix(in srgb, var(--bad) 45%, var(--rule)); }
+.card.exit { border-color: var(--accent); }
+.card.apq { border-color: color-mix(in srgb, var(--good) 55%, var(--rule)); }
+.apq-h { font-weight: 700; color: var(--good); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.8em; }
+.pill { display: inline-block; font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 10px; border-radius: 999px; vertical-align: middle; margin-right: 6px; }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.yes { color: var(--good); font-weight: 700; }
+.no { color: var(--bad); font-weight: 700; }
+
+code { font-family: var(--font-code); font-size: 0.86em; background: var(--code-bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+pre.java { margin: 0; background: var(--code-bg); border-radius: 10px; padding: 12px 16px; overflow-x: auto; font-size: 0.86em; line-height: 1.45; }
+pre.java code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+.tok-m { color: var(--method); font-weight: 700; }
+.tok-s { color: var(--str); }
+.tok-n { color: var(--num); }
+.tok-k { color: var(--accent); font-weight: 700; }
+.tok-c { color: var(--comment); font-style: italic; }
+
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+td code { white-space: nowrap; overflow-wrap: normal; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.tip { background: var(--tip-bg); border-left: 5px solid var(--tip-rule); border-radius: 10px; padding: 12px 14px; }
+.prob { border-top: 2px dashed var(--rule); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.q { display: flex; gap: 12px; align-items: flex-start; }
+.q > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; }
+.tag { flex: none; font-weight: 700; font-size: 0.85em; background: var(--accent); color: var(--surface); border-radius: 8px; padding: 2px 8px; margin-top: 2px; }
+details.ans { border: 2px solid var(--rule); border-radius: 10px; }
+details.ans summary { cursor: pointer; font-weight: 700; color: var(--accent); padding: 8px 14px; list-style: none; }
+details.ans summary::-webkit-details-marker { display: none; }
+details.ans summary::before { content: "▸ "; }
+details.ans[open] summary::before { content: "▾ "; }
+details.ans[open] { border-color: var(--good); }
+.ans-body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { font-weight: 700; text-decoration: none; background: var(--code-bg); border: 2px solid var(--rule); border-radius: 10px; padding: 6px 12px; }
+.links a:hover, .links a:focus-visible { border-color: var(--accent); }
+
+.days { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.dayc { font: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--rule); background: var(--code-bg); color: var(--ink); }
+.dayc:hover, .dayc:focus-visible { border-color: var(--accent); outline: none; }
+.dayc .dn { font-weight: 700; color: var(--accent); }
+.dayc.done { border-color: var(--good); }
+.dayc.done .dn::after { content: "  ✓ done"; color: var(--good); }
+
+.letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell { display: flex; flex-direction: column; align-items: center; min-width: 34px; border: 2px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.cell .ch { font-family: var(--font-code); font-weight: 700; padding: 3px 7px; }
+.cell .ix { font-family: var(--font-code); font-size: 0.72em; color: var(--muted); background: var(--code-bg); width: 100%; text-align: center; }
+.cell.on { border-color: var(--accent); }
+.cell.on .ch { background: var(--accent); color: var(--surface); }
+.cap { color: var(--muted); font-size: 0.9em; }
+
+.skel { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.skel > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.two { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.good-box, .bad-box { border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.good-box { background: var(--good-bg); } .good-box h3 { color: var(--good); }
+.bad-box { background: var(--bad-bg); } .bad-box h3 { color: var(--bad); }
+.checks { display: flex; flex-direction: column; gap: 8px; }
+.chk { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.chk input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--good); flex: none; }
+
+.mark { font: inherit; font-weight: 700; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--good); background: var(--surface); color: var(--good); cursor: pointer; }
+.mark .box { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--good); display: grid; place-items: center; }
+.mark[aria-pressed="true"] { background: var(--good-bg); }
+.mark[aria-pressed="true"] .box::after { content: "✓"; font-size: 0.85em; }
+.nav { display: flex; justify-content: space-between; gap: 10px; }
+.nav button { font: inherit; font-weight: 700; padding: 10px 18px; border-radius: 10px; border: 2px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+.nav button.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+@media (max-width: 560px) {
+  body { font-size: 17px; padding-top: 16px; }
+  .card { padding: 14px; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tab { padding: 6px 10px; font-size: 0.85em; white-space: nowrap; flex: none; }
+  .skel { grid-template-columns: minmax(0, 1fr); }
+}
+@media print {
+  .tabs, .nav, .mark, .progress, a.home { display: none !important; }
+  .panel[hidden] { display: flex !important; }
+  details.ans { display: none; }
+  .card { break-inside: avoid; }
+}
+.ph .yr { font-size: 0.6em; color: var(--muted); font-weight: 700; margin-left: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <a class="home" href="thanksgiving-frq1.html">← Thanksgiving FRQ 1 Walkthrough</a>
+  <h1>Past AP FRQ 1 Questions</h1>
+  <p class="lead">Five real AP Question 1s, each on one page. Write your answers by hand, then check them.</p>
+  <nav class="tabs" role="tablist" aria-label="Questions"><button class="tab" role="tab" id="tab-game" data-p="game" aria-controls="p-game" aria-selected="false">Game</button><button class="tab" role="tab" id="tab-wordmatch" data-p="wordmatch" aria-controls="p-wordmatch" aria-selected="false">WordMatch</button><button class="tab" role="tab" id="tab-feeder" data-p="feeder" aria-controls="p-feeder" aria-selected="false">Feeder</button><button class="tab" role="tab" id="tab-appointment" data-p="appointment" aria-controls="p-appointment" aria-selected="false">AppointmentBook</button><button class="tab" role="tab" id="tab-apcalendar" data-p="apcalendar" aria-controls="p-apcalendar" aria-selected="false">APCalendar</button></nav>
+  <section class="panel" id="p-game" role="tabpanel" aria-labelledby="tab-game" hidden><h2 class="ph">Game <span class="yr">2022 FRQ 1</span></h2><div class="tip"><b>About this version.</b> This is the real AP question rewritten in our own words, with our own examples. The class, the methods and the task are the same as on the exam, so the official scoring guidelines still apply.</div><section class="card"><h2>The classes</h2>
+<p>A one-player video game has three levels. A player tries to reach the goal in each level. Each level is a <code>Level</code> object.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> Level
+{
+    <span class="tok-c">/** Returns true if the player reached the goal on this level, false otherwise */</span>
+    <span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">goalReached</span>()
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Returns the number of points earned on this level */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">getPoints</span>()
+    { /* implementation not shown */ }
+}</code></pre><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> Game
+{
+    <span class="tok-k">private</span> Level levelOne;
+    <span class="tok-k">private</span> Level levelTwo;
+    <span class="tok-k">private</span> Level levelThree;
+
+    <span class="tok-c">/** Returns true if this game is a bonus game, false otherwise */</span>
+    <span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">isBonus</span>()
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Simulates playing one game. After it runs, the three levels</span>
+<span class="tok-c">     *  and isBonus() describe the game just played. */</span>
+    <span class="tok-k">public</span> <span class="tok-k">void</span> <span class="tok-m">play</span>()
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Returns the score of the game most recently played, part (a) */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">getScore</span>()
+    { /* to be implemented in part (a) */ }
+
+    <span class="tok-c">/** Plays num games and returns the highest score, part (b)</span>
+<span class="tok-c">     *  Precondition: num &gt; 0 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">playManyTimes</span>(<span class="tok-k">int</span> num)
+    { /* to be implemented in part (b) */ }
+}</code></pre></section><section class="card"><h2>(a) getScore</h2>
+<p>The score counts levels <b>in order</b>, and only while the player keeps reaching the goal:</p>
+<ul><li>If the player reached the goal in level one, add level one's points.</li>
+<li>Only if level one's goal was reached: if level two's goal was reached, add level two's points.</li>
+<li>Only if level two's goal was reached: if level three's goal was reached, add level three's points.</li>
+<li>Then, if the game is a bonus game, the score is <b>tripled</b>.</li></ul><div class="tw"><table><thead><tr><th>Level one</th><th>Level two</th><th>Level three</th><th>Bonus?</th><th>getScore()</th></tr></thead><tbody><tr><td>reached, 200 pts</td><td>reached, 100 pts</td><td>not reached, 500 pts</td><td>no</td><td>300</td></tr><tr><td>reached, 200 pts</td><td>reached, 100 pts</td><td>not reached, 500 pts</td><td>yes</td><td>900</td></tr><tr><td>not reached, 200 pts</td><td>reached, 100 pts</td><td>reached, 500 pts</td><td>no</td><td>0 (level one was not reached, so nothing counts)</td></tr><tr><td>reached, 50 pts</td><td>reached, 75 pts</td><td>reached, 25 pts</td><td>no</td><td>150</td></tr></tbody></table></div></section><section class="card"><h2>(b) playManyTimes</h2><p>Write <code>playManyTimes</code>, which plays <code>num</code> games and returns the <b>highest</b> score from those games. Each game must be played by calling <code>play()</code>, and its score found by calling <code>getScore()</code> after it. Assume <code>getScore</code> works, whatever you wrote in part (a).</p><div class="tw"><table><thead><tr><th>Game</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody><tr><td>Score after play()</td><td>150</td><td>900</td><td>300</td><td>900</td></tr></tbody></table></div><p>With those four games, <code>playManyTimes(4)</code> returns 900.</p></section><section class="card"><h2>Check your answers</h2><p>Write both parts by hand first, then open each solution and compare. Other correct solutions exist: trace yours with the examples.</p><details class="ans"><summary>Show part (a) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">getScore</span>()
+{
+    <span class="tok-k">int</span> score = <span class="tok-n">0</span>;
+    <span class="tok-k">if</span> (levelOne.<span class="tok-m">goalReached</span>())
+    {
+        score += levelOne.<span class="tok-m">getPoints</span>();
+        <span class="tok-k">if</span> (levelTwo.<span class="tok-m">goalReached</span>())
+        {
+            score += levelTwo.<span class="tok-m">getPoints</span>();
+            <span class="tok-k">if</span> (levelThree.<span class="tok-m">goalReached</span>())
+            {
+                score += levelThree.<span class="tok-m">getPoints</span>();
+            }
+        }
+    }
+    <span class="tok-k">if</span> (<span class="tok-m">isBonus</span>())
+    {
+        score *= <span class="tok-n">3</span>;
+    }
+    <span class="tok-k">return</span> score;
+}</code></pre></div></details><details class="ans"><summary>Show part (b) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">playManyTimes</span>(<span class="tok-k">int</span> num)
+{
+    <span class="tok-m">play</span>();
+    <span class="tok-k">int</span> best = <span class="tok-m">getScore</span>();            <span class="tok-c">// the first game is the starting best</span>
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">2</span>; i &lt;= num; i++)
+    {
+        <span class="tok-m">play</span>();                       <span class="tok-c">// play first, then read the score</span>
+        <span class="tok-k">int</span> score = <span class="tok-m">getScore</span>();
+        <span class="tok-k">if</span> (score &gt; best)
+        {
+            best = score;
+        }
+    }
+    <span class="tok-k">return</span> best;
+}</code></pre></div></details></section><section class="card"><h2>Official scoring</h2><div class="links"><a href="https://runestone.academy/ns/books/published/csawesome2/frq-game-score.html" target="_blank" rel="noopener">Practice it in CSAwesome</a></div></section></section>
+<section class="panel" id="p-wordmatch" role="tabpanel" aria-labelledby="tab-wordmatch" hidden><h2 class="ph">WordMatch <span class="yr">2021 FRQ 1</span></h2><div class="tip"><b>About this version.</b> This is the real AP question rewritten in our own words, with our own examples. The class, the methods and the task are the same as on the exam, so the official scoring guidelines still apply.</div><section class="card"><h2>The class</h2><p>A word game stores a secret word. Players make guesses, and each guess gets a score that depends on how often it appears inside the secret word.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> WordMatch
+{
+    <span class="tok-c">/** The secret string, all lowercase letters */</span>
+    <span class="tok-k">private</span> <span class="tok-k">String</span> secret;
+
+    <span class="tok-c">/** Returns the score for guess, as described in part (a)</span>
+<span class="tok-c">     *  Precondition: 0 &lt; guess.length() &lt;= secret.length() */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">scoreGuess</span>(<span class="tok-k">String</span> guess)
+    { /* to be implemented in part (a) */ }
+
+    <span class="tok-c">/** Returns the better of two guesses, as described in part (b)</span>
+<span class="tok-c">     *  Precondition: guess1 and guess2 are lowercase and different */</span>
+    <span class="tok-k">public</span> <span class="tok-k">String</span> <span class="tok-m">findBetterGuess</span>(<span class="tok-k">String</span> guess1, <span class="tok-k">String</span> guess2)
+    { /* to be implemented in part (b) */ }
+}</code></pre></section><section class="card"><h2>(a) scoreGuess</h2><p>The score is: <b>how many times</b> <code>guess</code> appears in <code>secret</code>, multiplied by <b>the length of guess, squared</b>. Appearances may overlap.</p><p>For these examples, <code>secret</code> is <code>"banana"</code>.</p><div class="tw"><table><thead><tr><th>guess</th><th>Times it appears</th><th>Score</th></tr></thead><tbody><tr><td>"an"</td><td>2</td><td>2 × 2 × 2 = 8</td></tr><tr><td>"ana"</td><td>2 (they overlap)</td><td>2 × 3 × 3 = 18</td></tr><tr><td>"b"</td><td>1</td><td>1 × 1 × 1 = 1</td></tr><tr><td>"nab"</td><td>0</td><td>0</td></tr></tbody></table></div></section><section class="card"><h2>(b) findBetterGuess</h2><p>Return whichever guess has the higher score from <code>scoreGuess</code>. If both scores are equal, return the guess that is <b>alphabetically greater</b>. Assume <code>scoreGuess</code> works, whatever you wrote in part (a).</p><div class="tw"><table><thead><tr><th>Call (secret is "banana")</th><th>Scores</th><th>Returns</th></tr></thead><tbody><tr><td>findBetterGuess("ana", "an")</td><td>18 and 8</td><td>"ana"</td></tr><tr><td>findBetterGuess("ban", "nan")</td><td>9 and 9 (tie)</td><td>"nan" (it comes after "ban")</td></tr></tbody></table></div></section><section class="card"><h2>Check your answers</h2><p>Write both parts by hand first, then open each solution and compare. Other correct solutions exist: trace yours with the examples.</p><details class="ans"><summary>Show part (a) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">scoreGuess</span>(<span class="tok-k">String</span> guess)
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">int</span> len = guess.<span class="tok-m">length</span>();
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> i = <span class="tok-n">0</span>; i &lt;= secret.<span class="tok-m">length</span>() - len; i++)
+    {
+        <span class="tok-k">if</span> (secret.<span class="tok-m">substring</span>(i, i + len).<span class="tok-m">equals</span>(guess))
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count * len * len;
+}</code></pre></div></details><details class="ans"><summary>Show part (b) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">String</span> <span class="tok-m">findBetterGuess</span>(<span class="tok-k">String</span> guess1, <span class="tok-k">String</span> guess2)
+{
+    <span class="tok-k">int</span> score1 = <span class="tok-m">scoreGuess</span>(guess1);      <span class="tok-c">// part (a) method: no dot</span>
+    <span class="tok-k">int</span> score2 = <span class="tok-m">scoreGuess</span>(guess2);
+    <span class="tok-k">if</span> (score1 &gt; score2)
+    {
+        <span class="tok-k">return</span> guess1;
+    }
+    <span class="tok-k">if</span> (score2 &gt; score1)
+    {
+        <span class="tok-k">return</span> guess2;
+    }
+    <span class="tok-k">if</span> (guess1.<span class="tok-m">compareTo</span>(guess2) &gt; <span class="tok-n">0</span>)     <span class="tok-c">// tie: alphabetically greater wins</span>
+    {
+        <span class="tok-k">return</span> guess1;
+    }
+    <span class="tok-k">return</span> guess2;
+}</code></pre></div></details></section></section>
+<section class="panel" id="p-feeder" role="tabpanel" aria-labelledby="tab-feeder" hidden><h2 class="ph">Feeder <span class="yr">2024 FRQ 1</span></h2><div class="tip"><b>About this version.</b> This is the real AP question rewritten in our own words, with our own examples. The class, the methods and the task are the same as on the exam, so the official scoring guidelines still apply.</div><section class="card"><h2>The class</h2><p>A bird feeder holds food, measured in grams. Each day, birds come to eat, or, rarely, a bear comes and eats everything.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> Feeder
+{
+    <span class="tok-c">/** Grams of food in the feeder; always &gt;= 0 */</span>
+    <span class="tok-k">private</span> <span class="tok-k">int</span> currentFood;
+
+    <span class="tok-c">/** Simulates one day with numBirds birds or possibly a bear,</span>
+<span class="tok-c">     *  as described in part (a). Precondition: numBirds &gt; 0 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">void</span> <span class="tok-m">simulateOneDay</span>(<span class="tok-k">int</span> numBirds)
+    { /* to be implemented in part (a) */ }
+
+    <span class="tok-c">/** Simulates up to numDays days and returns the number of days</span>
+<span class="tok-c">     *  birds or a bear found food, as described in part (b)</span>
+<span class="tok-c">     *  Preconditions: numBirds &gt; 0, numDays &gt; 0 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">simulateManyDays</span>(<span class="tok-k">int</span> numBirds, <span class="tok-k">int</span> numDays)
+    { /* to be implemented in part (b) */ }
+}</code></pre></section><section class="card"><h2>(a) simulateOneDay</h2>
+<ul><li><b>95% of days are normal.</b> Every bird eats the <b>same</b> random amount of food, a whole number of grams from <b>10 to 50</b> inclusive. If the birds want more food than the feeder holds, they empty it (<code>currentFood</code> becomes 0). Otherwise the food they eat is taken away.</li>
+<li><b>5% of days, a bear comes</b> and empties the feeder: <code>currentFood</code> becomes 0.</li></ul><div class="tw"><table><thead><tr><th>currentFood before</th><th>Call</th><th>What happened (one possible day)</th><th>currentFood after</th></tr></thead><tbody><tr><td>400</td><td>simulateOneDay(5)</td><td>Each bird ate 30 g: 150 g in total</td><td>250</td></tr><tr><td>400</td><td>simulateOneDay(5)</td><td>A bear came</td><td>0</td></tr><tr><td>200</td><td>simulateOneDay(5)</td><td>Each bird wanted 50 g: 250 g, more than 200</td><td>0</td></tr></tbody></table></div></section><section class="card"><h2>(b) simulateManyDays</h2><p>Simulate one day at a time, for up to <code>numDays</code> days, using <code>simulateOneDay</code>. Stop early as soon as the feeder is empty, because no later day can have food. Return how many days started with food in the feeder (<code>currentFood</code> greater than 0). Assume <code>simulateOneDay</code> works, whatever you wrote in part (a).</p><div class="tw"><table><thead><tr><th>Situation</th><th>Returns</th></tr></thead><tbody><tr><td>numDays is 5, and the feeder becomes empty during day 3</td><td>3</td></tr><tr><td>numDays is 5, and there is still food after day 5</td><td>5</td></tr><tr><td>The feeder is already empty before day 1</td><td>0</td></tr></tbody></table></div></section><section class="card"><h2>Check your answers</h2><p>Write both parts by hand first, then open each solution and compare. Other correct solutions exist: trace yours with the examples.</p><details class="ans"><summary>Show part (a) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">void</span> <span class="tok-m">simulateOneDay</span>(<span class="tok-k">int</span> numBirds)
+{
+    <span class="tok-k">if</span> (Math.<span class="tok-m">random</span>() &lt; <span class="tok-n">0.05</span>)                      <span class="tok-c">// 5% chance: a bear</span>
+    {
+        currentFood = <span class="tok-n">0</span>;
+    }
+    <span class="tok-k">else</span>
+    {
+        <span class="tok-k">int</span> each = (<span class="tok-k">int</span>) (Math.<span class="tok-m">random</span>() * <span class="tok-n">41</span>) + <span class="tok-n">10</span>;   <span class="tok-c">// 10 to 50 grams</span>
+        <span class="tok-k">int</span> eaten = numBirds * each;
+        <span class="tok-k">if</span> (eaten &gt; currentFood)
+        {
+            currentFood = <span class="tok-n">0</span>;
+        }
+        <span class="tok-k">else</span>
+        {
+            currentFood -= eaten;
+        }
+    }
+}</code></pre></div></details><details class="ans"><summary>Show part (b) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">simulateManyDays</span>(<span class="tok-k">int</span> numBirds, <span class="tok-k">int</span> numDays)
+{
+    <span class="tok-k">int</span> days = <span class="tok-n">0</span>;
+    <span class="tok-k">while</span> (days &lt; numDays &amp;&amp; currentFood &gt; <span class="tok-n">0</span>)
+    {
+        <span class="tok-m">simulateOneDay</span>(numBirds);    <span class="tok-c">// part (a) method: no dot</span>
+        days++;
+    }
+    <span class="tok-k">return</span> days;
+}</code></pre></div></details></section><section class="card"><h2>Official scoring</h2><div class="links"><a href="https://apcentral.collegeboard.org/media/pdf/ap24-frq-comp-sci-a.pdf" target="_blank" rel="noopener">Official 2024 questions (PDF), Q1 on pages 3–7</a><a href="https://apcentral.collegeboard.org/media/pdf/ap24-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2024 Q1 scoring guidelines</a></div></section></section>
+<section class="panel" id="p-appointment" role="tabpanel" aria-labelledby="tab-appointment" hidden><h2 class="ph">AppointmentBook <span class="yr">2023 FRQ 1</span></h2><div class="tip"><b>About this version.</b> This is the real AP question rewritten in our own words, with our own examples. The class, the methods and the task are the same as on the exam, so the official scoring guidelines still apply.</div><section class="card"><h2>The class</h2><p>Students book appointments with a teacher. The school day has periods 1 to 8, and each period has 60 minutes, numbered <b>0 to 59</b>. An appointment uses a block of <b>consecutive</b> free minutes inside one period.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> AppointmentBook
+{
+    <span class="tok-c">/** Returns true if minute in period is free, false otherwise</span>
+<span class="tok-c">     *  Preconditions: 1 &lt;= period &lt;= 8; 0 &lt;= minute &lt;= 59 */</span>
+    <span class="tok-k">private</span> <span class="tok-k">boolean</span> <span class="tok-m">isMinuteFree</span>(<span class="tok-k">int</span> period, <span class="tok-k">int</span> minute)
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Marks duration minutes in period as taken, starting at startMinute</span>
+<span class="tok-c">     *  Preconditions: 1 &lt;= period &lt;= 8; 0 &lt;= startMinute &lt;= 59;</span>
+<span class="tok-c">     *                 1 &lt;= duration &lt;= 60; those minutes are free */</span>
+    <span class="tok-k">private</span> <span class="tok-k">void</span> <span class="tok-m">reserveBlock</span>(<span class="tok-k">int</span> period, <span class="tok-k">int</span> startMinute, <span class="tok-k">int</span> duration)
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Returns the first minute of the earliest block of duration free</span>
+<span class="tok-c">     *  minutes in period, or -1, as described in part (a)</span>
+<span class="tok-c">     *  Preconditions: 1 &lt;= period &lt;= 8; 1 &lt;= duration &lt;= 60 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">findFreeBlock</span>(<span class="tok-k">int</span> period, <span class="tok-k">int</span> duration)
+    { /* to be implemented in part (a) */ }
+
+    <span class="tok-c">/** Books an appointment as described in part (b) and returns true,</span>
+<span class="tok-c">     *  or returns false if none could be booked</span>
+<span class="tok-c">     *  Preconditions: 1 &lt;= startPeriod &lt;= endPeriod &lt;= 8; 1 &lt;= duration &lt;= 60 */</span>
+    <span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">makeAppointment</span>(<span class="tok-k">int</span> startPeriod, <span class="tok-k">int</span> endPeriod, <span class="tok-k">int</span> duration)
+    { /* to be implemented in part (b) */ }
+}</code></pre></section><section class="card"><h2>(a) findFreeBlock</h2><p>Find the <b>earliest</b> block of <code>duration</code> free minutes in a row in <code>period</code>, and return its first minute. Return -1 if there is none. Use <code>isMinuteFree</code>. This method books nothing.</p><p>In these examples, period 2 looks like this: minutes 0–9 taken, <b>10–24 free</b>, 25–29 taken, <b>30–59 free</b>.</p><div class="tw"><table><thead><tr><th>Call</th><th>Returns</th><th>Why</th></tr></thead><tbody><tr><td>findFreeBlock(2, 15)</td><td>10</td><td>Minutes 10–24 are 15 free minutes in a row.</td></tr><tr><td>findFreeBlock(2, 20)</td><td>30</td><td>10–24 is only 15 long. 30–49 is the first block of 20.</td></tr><tr><td>findFreeBlock(2, 31)</td><td>-1</td><td>The longest free block, 30–59, is 30 minutes.</td></tr></tbody></table></div></section><section class="card"><h2>(b) makeAppointment</h2><p>Check the periods in order from <code>startPeriod</code> to <code>endPeriod</code>. In the <b>first</b> period that has a block of <code>duration</code> free minutes, reserve the earliest such block with <code>reserveBlock</code> and return true. Book only one block. If no period has one, book nothing and return false. You must use <code>findFreeBlock</code>; assume it works, whatever you wrote in part (a).</p><div class="tw"><table><thead><tr><th>Call</th><th>Returns</th><th>What is booked</th></tr></thead><tbody><tr><td>makeAppointment(2, 4, 30), if period 2 is as above</td><td>true</td><td>Period 2, minutes 30–59</td></tr><tr><td>makeAppointment(1, 3, 45), if no period from 1 to 3 has 45 free minutes in a row</td><td>false</td><td>Nothing</td></tr></tbody></table></div></section><section class="card"><h2>Check your answers</h2><p>Write both parts by hand first, then open each solution and compare. Other correct solutions exist: trace yours with the examples.</p><details class="ans"><summary>Show part (a) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">int</span> <span class="tok-m">findFreeBlock</span>(<span class="tok-k">int</span> period, <span class="tok-k">int</span> duration)
+{
+    <span class="tok-k">int</span> inARow = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> minute = <span class="tok-n">0</span>; minute &lt;= <span class="tok-n">59</span>; minute++)
+    {
+        <span class="tok-k">if</span> (<span class="tok-m">isMinuteFree</span>(period, minute))
+        {
+            inARow++;
+            <span class="tok-k">if</span> (inARow == duration)
+            {
+                <span class="tok-k">return</span> minute - duration + <span class="tok-n">1</span>;   <span class="tok-c">// where the block started</span>
+            }
+        }
+        <span class="tok-k">else</span>
+        {
+            inARow = <span class="tok-n">0</span>;                         <span class="tok-c">// the streak is broken</span>
+        }
+    }
+    <span class="tok-k">return</span> -<span class="tok-n">1</span>;
+}</code></pre></div></details><details class="ans"><summary>Show part (b) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">boolean</span> <span class="tok-m">makeAppointment</span>(<span class="tok-k">int</span> startPeriod, <span class="tok-k">int</span> endPeriod, <span class="tok-k">int</span> duration)
+{
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> period = startPeriod; period &lt;= endPeriod; period++)
+    {
+        <span class="tok-k">int</span> start = <span class="tok-m">findFreeBlock</span>(period, duration);
+        <span class="tok-k">if</span> (start != -<span class="tok-n">1</span>)
+        {
+            <span class="tok-m">reserveBlock</span>(period, start, duration);
+            <span class="tok-k">return</span> <span class="tok-k">true</span>;
+        }
+    }
+    <span class="tok-k">return</span> <span class="tok-k">false</span>;                               <span class="tok-c">// only after every period</span>
+}</code></pre></div></details></section><section class="card"><h2>Official scoring</h2><div class="links"><a href="https://apcentral.collegeboard.org/media/pdf/ap23-apc-computer-science-a-q1.pdf" target="_blank" rel="noopener">2023 Q1 scoring guidelines and student samples</a></div></section></section>
+<section class="panel" id="p-apcalendar" role="tabpanel" aria-labelledby="tab-apcalendar" hidden><h2 class="ph">APCalendar <span class="yr">2019 FRQ 1</span></h2><div class="tip"><b>About this version.</b> This is the real AP question rewritten in our own words, with our own examples. The class, the methods and the task are the same as on the exam, so the official scoring guidelines still apply.</div><section class="card"><h2>The class</h2><p>All the methods in this class are <code>static</code>, so inside the class you call them by name, with no dot. Days of the week are numbered <b>0 (Sunday) to 6 (Saturday)</b>.</p><pre class="java"><code><span class="tok-k">public</span> <span class="tok-k">class</span> APCalendar
+{
+    <span class="tok-c">/** Returns true if year is a leap year, false otherwise */</span>
+    <span class="tok-k">private</span> static <span class="tok-k">boolean</span> <span class="tok-m">isLeapYear</span>(<span class="tok-k">int</span> year)
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Returns the number of leap years from year1 to year2, inclusive,</span>
+<span class="tok-c">     *  as described in part (a). Precondition: 0 &lt;= year1 &lt;= year2 */</span>
+    <span class="tok-k">public</span> static <span class="tok-k">int</span> <span class="tok-m">numberOfLeapYears</span>(<span class="tok-k">int</span> year1, <span class="tok-k">int</span> year2)
+    { /* to be implemented in part (a) */ }
+
+    <span class="tok-c">/** Returns the day of the week (0 to 6) of January 1 of year */</span>
+    <span class="tok-k">private</span> static <span class="tok-k">int</span> <span class="tok-m">firstDayOfYear</span>(<span class="tok-k">int</span> year)
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Returns n, where the date is the nth day of its year.</span>
+<span class="tok-c">     *  January 1 is day 1. Precondition: the date is valid */</span>
+    <span class="tok-k">private</span> static <span class="tok-k">int</span> <span class="tok-m">dayOfYear</span>(<span class="tok-k">int</span> month, <span class="tok-k">int</span> day, <span class="tok-k">int</span> year)
+    { /* implementation not shown */ }
+
+    <span class="tok-c">/** Returns the day of the week (0 to 6) of the given date,</span>
+<span class="tok-c">     *  as described in part (b). Precondition: the date is valid */</span>
+    <span class="tok-k">public</span> static <span class="tok-k">int</span> <span class="tok-m">dayOfWeek</span>(<span class="tok-k">int</span> month, <span class="tok-k">int</span> day, <span class="tok-k">int</span> year)
+    { /* to be implemented in part (b) */ }
+}</code></pre></section><section class="card"><h2>(a) numberOfLeapYears</h2><p>Return how many leap years there are from <code>year1</code> to <code>year2</code>, including both. You must use <code>isLeapYear</code>.</p><div class="tw"><table><thead><tr><th>Call</th><th>Returns</th><th>Why</th></tr></thead><tbody><tr><td>numberOfLeapYears(2020, 2026)</td><td>2</td><td>2020 and 2024</td></tr><tr><td>numberOfLeapYears(2021, 2023)</td><td>0</td><td>None of these is a leap year</td></tr><tr><td>numberOfLeapYears(2024, 2024)</td><td>1</td><td>Only 2024, and it is a leap year</td></tr></tbody></table></div></section><section class="card"><h2>(b) dayOfWeek</h2><p>Return the day of the week of the date. Use <code>firstDayOfYear</code> and <code>dayOfYear</code>: if January 1 falls on day <i>f</i>, the <i>n</i>th day of the year falls <i>n</i> − 1 days later, wrapping around after Saturday.</p><div class="tw"><table><thead><tr><th>Facts</th><th>Call</th><th>Returns</th></tr></thead><tbody><tr><td>firstDayOfYear(2026) is 4 (Thursday); January 10 is day 10</td><td>dayOfWeek(1, 10, 2026)</td><td>6 (Saturday): (4 + 10 − 1) % 7 = 6</td></tr><tr><td>January 1 is day 1</td><td>dayOfWeek(1, 1, 2026)</td><td>4 (Thursday)</td></tr></tbody></table></div></section><section class="card"><h2>Check your answers</h2><p>Write both parts by hand first, then open each solution and compare. Other correct solutions exist: trace yours with the examples.</p><details class="ans"><summary>Show part (a) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> static <span class="tok-k">int</span> <span class="tok-m">numberOfLeapYears</span>(<span class="tok-k">int</span> year1, <span class="tok-k">int</span> year2)
+{
+    <span class="tok-k">int</span> count = <span class="tok-n">0</span>;
+    <span class="tok-k">for</span> (<span class="tok-k">int</span> year = year1; year &lt;= year2; year++)
+    {
+        <span class="tok-k">if</span> (<span class="tok-m">isLeapYear</span>(year))
+        {
+            count++;
+        }
+    }
+    <span class="tok-k">return</span> count;
+}</code></pre></div></details><details class="ans"><summary>Show part (b) solution</summary><div class="ans-body"><pre class="java"><code><span class="tok-k">public</span> static <span class="tok-k">int</span> <span class="tok-m">dayOfWeek</span>(<span class="tok-k">int</span> month, <span class="tok-k">int</span> day, <span class="tok-k">int</span> year)
+{
+    <span class="tok-k">int</span> first = <span class="tok-m">firstDayOfYear</span>(year);
+    <span class="tok-k">int</span> n = <span class="tok-m">dayOfYear</span>(month, day, year);
+    <span class="tok-k">return</span> (first + n - <span class="tok-n">1</span>) % <span class="tok-n">7</span>;
+}</code></pre></div></details></section><section class="card"><h2>Official scoring</h2><div class="links"><a href="https://runestone.academy/ns/books/published/csawesome2/FRQcalendar.html" target="_blank" rel="noopener">Practice it in CSAwesome</a></div></section></section>
+
+</main>
+<script>
+const tabs = document.querySelectorAll('.tab');
+function show(p, push) {
+  if (!document.getElementById('p-' + p)) p = 'game';
+  tabs.forEach((t) => {
+    const on = t.dataset.p === p;
+    t.setAttribute('aria-selected', String(on));
+    document.getElementById('p-' + t.dataset.p).hidden = !on;
+  });
+  if (push) { try { history.replaceState(null, '', '#' + p); } catch (e) {} window.scrollTo({ top: 0 }); }
+}
+tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.p, true)));
+show(location.hash.slice(1) || 'game', false);
+window.addEventListener('hashchange', () => show(location.hash.slice(1), false));
+</script>
+</body>
+</html>
